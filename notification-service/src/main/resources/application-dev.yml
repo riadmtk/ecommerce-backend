@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${NOTIFICATION_DB_HOST:localhost}:${NOTIFICATION_DB_PORT:5432}/${NOTIFICATION_DB_NAME:ecommerce_notifications}
+    username: ${NOTIFICATION_DB_USERNAME:postgres}
+    password: ${NOTIFICATION_DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+
+logging:
+  level:
+    com.ecommerce.notification: DEBUG

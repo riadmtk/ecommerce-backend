@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: search-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  elasticsearch:
+    uris: http://${ELASTICSEARCH_HOST:localhost}:${ELASTICSEARCH_PORT:9200}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: ${KAFKA_GROUP_ID:ecommerce-group}
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+server:
+  port: 8083
+
+kafka:
+  topics:
+    product-updated: product.events

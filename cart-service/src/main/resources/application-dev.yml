@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${CART_DB_HOST:localhost}:${CART_DB_PORT:5432}/${CART_DB_NAME:ecommerce_cart}
+    username: ${CART_DB_USERNAME:postgres}
+    password: ${CART_DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+
+logging:
+  level:
+    com.ecommerce.cart: DEBUG

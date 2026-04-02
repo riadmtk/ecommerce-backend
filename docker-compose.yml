@@ -1,0 +1,450 @@
+version: '3.8'
+
+# ===== RÉSEAU DÉDIÉ =====
+networks:
+  ecommerce-network:
+    driver: bridge
+    name: ecommerce-network
+
+# ===== VOLUMES =====
+volumes:
+  postgres-user-data:
+  postgres-product-data:
+  postgres-cart-data:
+  postgres-order-data:
+  postgres-payment-data:
+  postgres-notification-data:
+  postgres-wishlist-data:
+  elasticsearch-data:
+  kafka-data:
+  zookeeper-data:
+
+services:
+
+  # =============================================
+  # INFRASTRUCTURE
+  # =============================================
+
+  # ----- Zookeeper (requis par Kafka) -----
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    networks:
+      - ecommerce-network
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----- Kafka -----
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    networks:
+      - ecommerce-network
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:29092", "--list"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  # ----- ElasticSearch -----
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    container_name: elasticsearch
+    networks:
+      - ecommerce-network
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  # =============================================
+  # BASES DE DONNÉES — une par service
+  # =============================================
+
+  postgres-users:
+    image: postgres:15-alpine
+    container_name: postgres-users
+    networks:
+      - ecommerce-network
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: ecommerce_users
+      POSTGRES_USER: ${USER_DB_USERNAME}
+      POSTGRES_PASSWORD: ${USER_DB_PASSWORD}
+    volumes:
+      - postgres-user-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USER_DB_USERNAME} -d ecommerce_users"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-products:
+    image: postgres:15-alpine
+    container_name: postgres-products
+    networks:
+      - ecommerce-network
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: ecommerce_products
+      POSTGRES_USER: ${PRODUCT_DB_USERNAME}
+      POSTGRES_PASSWORD: ${PRODUCT_DB_PASSWORD}
+    volumes:
+      - postgres-product-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PRODUCT_DB_USERNAME} -d ecommerce_products"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-cart:
+    image: postgres:15-alpine
+    container_name: postgres-cart
+    networks:
+      - ecommerce-network
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: ecommerce_cart
+      POSTGRES_USER: ${CART_DB_USERNAME}
+      POSTGRES_PASSWORD: ${CART_DB_PASSWORD}
+    volumes:
+      - postgres-cart-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${CART_DB_USERNAME} -d ecommerce_cart"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-orders:
+    image: postgres:15-alpine
+    container_name: postgres-orders
+    networks:
+      - ecommerce-network
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_DB: ecommerce_orders
+      POSTGRES_USER: ${ORDER_DB_USERNAME}
+      POSTGRES_PASSWORD: ${ORDER_DB_PASSWORD}
+    volumes:
+      - postgres-order-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ORDER_DB_USERNAME} -d ecommerce_orders"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-payments:
+    image: postgres:15-alpine
+    container_name: postgres-payments
+    networks:
+      - ecommerce-network
+    ports:
+      - "5437:5432"
+    environment:
+      POSTGRES_DB: ecommerce_payments
+      POSTGRES_USER: ${PAYMENT_DB_USERNAME}
+      POSTGRES_PASSWORD: ${PAYMENT_DB_PASSWORD}
+    volumes:
+      - postgres-payment-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PAYMENT_DB_USERNAME} -d ecommerce_payments"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-notifications:
+    image: postgres:15-alpine
+    container_name: postgres-notifications
+    networks:
+      - ecommerce-network
+    ports:
+      - "5438:5432"
+    environment:
+      POSTGRES_DB: ecommerce_notifications
+      POSTGRES_USER: ${NOTIFICATION_DB_USERNAME}
+      POSTGRES_PASSWORD: ${NOTIFICATION_DB_PASSWORD}
+    volumes:
+      - postgres-notification-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${NOTIFICATION_DB_USERNAME} -d ecommerce_notifications"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-wishlist:
+    image: postgres:15-alpine
+    container_name: postgres-wishlist
+    networks:
+      - ecommerce-network
+    ports:
+      - "5439:5432"
+    environment:
+      POSTGRES_DB: ecommerce_wishlist
+      POSTGRES_USER: ${WISHLIST_DB_USERNAME}
+      POSTGRES_PASSWORD: ${WISHLIST_DB_PASSWORD}
+    volumes:
+      - postgres-wishlist-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${WISHLIST_DB_USERNAME} -d ecommerce_wishlist"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============================================
+  # MICROSERVICES
+  # =============================================
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    networks:
+      - ecommerce-network
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
+    depends_on:
+      - user-service
+      - product-service
+      - cart-service
+      - order-service
+      - payment-service
+      - notification-service
+      - wishlist-service
+      - search-service
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    networks:
+      - ecommerce-network
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      USER_DB_HOST: postgres-users
+      USER_DB_PORT: 5432
+      USER_DB_NAME: ecommerce_users
+      USER_DB_USERNAME: ${USER_DB_USERNAME}
+      USER_DB_PASSWORD: ${USER_DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      postgres-users:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    container_name: product-service
+    networks:
+      - ecommerce-network
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      PRODUCT_DB_HOST: postgres-products
+      PRODUCT_DB_PORT: 5432
+      PRODUCT_DB_NAME: ecommerce_products
+      PRODUCT_DB_USERNAME: ${PRODUCT_DB_USERNAME}
+      PRODUCT_DB_PASSWORD: ${PRODUCT_DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      postgres-products:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  search-service:
+    build:
+      context: ./search-service
+      dockerfile: Dockerfile
+    container_name: search-service
+    networks:
+      - ecommerce-network
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      ELASTICSEARCH_HOST: elasticsearch
+      ELASTICSEARCH_PORT: 9200
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  cart-service:
+    build:
+      context: ./cart-service
+      dockerfile: Dockerfile
+    container_name: cart-service
+    networks:
+      - ecommerce-network
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      CART_DB_HOST: postgres-cart
+      CART_DB_PORT: 5432
+      CART_DB_NAME: ecommerce_cart
+      CART_DB_USERNAME: ${CART_DB_USERNAME}
+      CART_DB_PASSWORD: ${CART_DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      postgres-cart:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    networks:
+      - ecommerce-network
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      ORDER_DB_HOST: postgres-orders
+      ORDER_DB_PORT: 5432
+      ORDER_DB_NAME: ecommerce_orders
+      ORDER_DB_USERNAME: ${ORDER_DB_USERNAME}
+      ORDER_DB_PASSWORD: ${ORDER_DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      postgres-orders:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    container_name: payment-service
+    networks:
+      - ecommerce-network
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      PAYMENT_DB_HOST: postgres-payments
+      PAYMENT_DB_PORT: 5432
+      PAYMENT_DB_NAME: ecommerce_payments
+      PAYMENT_DB_USERNAME: ${PAYMENT_DB_USERNAME}
+      PAYMENT_DB_PASSWORD: ${PAYMENT_DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      STRIPE_API_KEY: ${STRIPE_API_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID}
+      PAYPAL_CLIENT_SECRET: ${PAYPAL_CLIENT_SECRET}
+      PAYPAL_MODE: ${PAYPAL_MODE:-sandbox}
+    depends_on:
+      postgres-payments:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    networks:
+      - ecommerce-network
+    ports:
+      - "8087:8087"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      NOTIFICATION_DB_HOST: postgres-notifications
+      NOTIFICATION_DB_PORT: 5432
+      NOTIFICATION_DB_NAME: ecommerce_notifications
+      NOTIFICATION_DB_USERNAME: ${NOTIFICATION_DB_USERNAME}
+      NOTIFICATION_DB_PASSWORD: ${NOTIFICATION_DB_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+    depends_on:
+      postgres-notifications:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  wishlist-service:
+    build:
+      context: ./wishlist-service
+      dockerfile: Dockerfile
+    container_name: wishlist-service
+    networks:
+      - ecommerce-network
+    ports:
+      - "8088:8088"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      WISHLIST_DB_HOST: postgres-wishlist
+      WISHLIST_DB_PORT: 5432
+      WISHLIST_DB_NAME: ecommerce_wishlist
+      WISHLIST_DB_USERNAME: ${WISHLIST_DB_USERNAME}
+      WISHLIST_DB_PASSWORD: ${WISHLIST_DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      postgres-wishlist:
+        condition: service_healthy

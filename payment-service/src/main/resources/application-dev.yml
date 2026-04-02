@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${PAYMENT_DB_HOST:localhost}:${PAYMENT_DB_PORT:5432}/${PAYMENT_DB_NAME:ecommerce_payments}
+    username: ${PAYMENT_DB_USERNAME:postgres}
+    password: ${PAYMENT_DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+
+logging:
+  level:
+    com.ecommerce.payment: DEBUG
