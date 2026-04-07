@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${WISHLIST_DB_HOST:localhost}:${WISHLIST_DB_PORT:5432}/${WISHLIST_DB_NAME:ecommerce_wishlist}
+    username: ${WISHLIST_DB_USERNAME:postgres}
+    password: ${WISHLIST_DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+logging:
+  level:
+    com.ecommerce.wishlist: DEBUG

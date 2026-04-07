@@ -1,0 +1,12 @@
+spring:
+  elasticsearch:
+    uris: http://localhost:9200
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: ecommerce-group
+
+logging:
+  level:
+    com.ecommerce.search: DEBUG
+    org.springframework.data.elasticsearch: DEBUG
