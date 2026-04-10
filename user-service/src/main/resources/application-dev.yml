@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${USER_DB_HOST:localhost}:${USER_DB_PORT:5432}/${USER_DB_NAME:ecommerce_users}
+    url: jdbc:postgresql://${USER_DB_HOST:localhost}:${USER_DB_PORT:5433}/${USER_DB_NAME:ecommerce_users}
     username: ${USER_DB_USERNAME:postgres}
-    password: ${USER_DB_PASSWORD:postgres}
+    password: ${USER_DB_PASSWORD:postgres123}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -13,8 +13,17 @@ spring:
         format_sql: true
   flyway:
     enabled: false
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}   # ← Ajoutez cette ligne
 
 logging:
   level:
     com.ecommerce.user: DEBUG
     org.springframework.security: DEBUG
+    com.ecommerce.user.infrastructure.adapter.out.messaging: DEBUG
+    org.springframework.kafka: INFO
+
+jwt:
+  secret: "devSecretKeyForLocalTestingOnly-256bits!"
+  expiration-ms: 86400000
+
