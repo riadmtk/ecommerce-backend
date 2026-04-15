@@ -27,10 +27,10 @@ applications Angular (Front Office & Back Office).
 ## 📦 Microservices Prévus
 
 | **Service**          | **Port prévu** | **Statut** | **Description**             |
-| -------------------- | -------------- | ---------- | ----------------------------|
+| -------------------- | -------------- |-----------| ----------------------------|
 | API Gateway          | 8080           | 🔜 À venir | Point d'entrée unique       |
-| User Service         | 8081           | 🔜 À venir | Auth, profil, comptes       |
-| Product Service      | 8082           | 🔜 À venir | Catalogue, stock            |
+| User Service         | 8081           | ✅ Términé | Auth, profil, comptes       |
+| Product Service      | 8082           | ✅ Términé | Catalogue, stock            |
 | Search Service       | 8083           | 🔜 À venir | Recherche full-text         |
 | Cart Service         | 8084           | 🔜 À venir | Panier, checkout            |
 | Order Service        | 8085           | 🔜 À venir | Commandes                   |

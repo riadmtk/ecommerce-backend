@@ -27,7 +27,7 @@ public class User {
     public static User create(String firstName, String lastName,
                               String email, String encodedPassword) {
         return User.builder()
-                .id(null)
+                .id(UUID.randomUUID())   // ← génération systématique
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)

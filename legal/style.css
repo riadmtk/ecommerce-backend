@@ -1,0 +1,110 @@
+/* style.css - Thème MTK */
+:root {
+    --primary: #1e3c72;
+    --secondary: #2a5298;
+    --accent: #f8f9fa;
+    --text: #333;
+    --border: #dee2e6;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    line-height: 1.6;
+    color: var(--text);
+    background: #fff;
+    padding: 2rem 1rem;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: var(--primary);
+    border-bottom: 3px solid var(--secondary);
+    padding-bottom: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+h2 {
+    font-size: 1.6rem;
+    color: var(--primary);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+h3 {
+    font-size: 1.3rem;
+    color: var(--secondary);
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+p, li {
+    margin-bottom: 1rem;
+}
+
+ul, ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+a {
+    color: var(--secondary);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+}
+
+th, td {
+    border: 1px solid var(--border);
+    padding: 0.75rem;
+    text-align: left;
+}
+
+th {
+    background: var(--primary);
+    color: white;
+}
+
+.footer-note {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+    color: #666;
+    text-align: right;
+}
+
+.highlight {
+    background: var(--accent);
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--secondary);
+}
+
+@media (max-width: 600px) {
+    body { padding: 1rem 0.5rem; }
+    .container { padding: 1.5rem; }
+    h1 { font-size: 2rem; }
+}

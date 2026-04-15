@@ -5,7 +5,6 @@ import com.ecommerce.user.domain.model.User;
 import com.ecommerce.user.domain.model.UserRole;
 import com.ecommerce.user.domain.port.in.RegisterUseCase;
 import com.ecommerce.user.domain.port.out.PasswordEncoderPort;
-import com.ecommerce.user.domain.port.out.UserEventPublisherPort;
 import com.ecommerce.user.domain.port.out.UserRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,7 +31,7 @@ class RegisterServiceTest {
     private PasswordEncoderPort passwordEncoder;
 
     @Mock
-    private UserEventPublisherPort eventPublisher; // ← ajouter
+    private ApplicationEventPublisher applicationEventPublisher;   // ← nouveau mock
 
     @InjectMocks
     private RegisterService registerService;
@@ -62,6 +62,7 @@ class RegisterServiceTest {
         assertThat(result.getFirstName()).isEqualTo("Mohammed Riad");
         assertThat(result.getRole()).isEqualTo(UserRole.USER);
         verify(userRepository).save(any(User.class));
+        verify(applicationEventPublisher).publishEvent(any(User.class));   // vérification de l'événement
     }
 
     @Test
@@ -97,6 +98,6 @@ class RegisterServiceTest {
 
         registerService.register(validCommand);
 
-        verify(eventPublisher).publishUserRegistered(any(User.class)); // ← vérifier
+        verify(applicationEventPublisher).publishEvent(any(User.class));
     }
 }

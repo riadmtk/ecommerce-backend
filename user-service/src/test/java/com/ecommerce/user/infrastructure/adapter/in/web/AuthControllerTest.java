@@ -18,6 +18,7 @@ import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -40,12 +41,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({SecurityConfig.class, JwtAuthenticationFilter.class, UserDetailsServiceImpl.class})
 @DisplayName("AuthController - Tests Infrastructure")
 class AuthControllerTest {
-//hahahha
-    @Autowired
-    private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private MockMvc mockMvc;
 
     @MockitoBean
     private RegisterUseCase registerUseCase;
@@ -54,7 +52,7 @@ class AuthControllerTest {
     private LoginUseCase loginUseCase;
 
     @MockitoBean
-    private JwtPort jwtPort;
+    private JwtPort jwtPort;   // ← mock requis pour la nouvelle implémentation
 
     @MockitoBean
     private UserRepositoryPort userRepository;
@@ -74,22 +72,21 @@ class AuthControllerTest {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        // JWT filter ne bloque pas les requêtes
+        // Configurations par défaut pour éviter les interférences
         lenient().when(jwtPort.extractEmail(anyString())).thenReturn(null);
         lenient().when(jwtPort.isTokenValid(anyString(), anyString())).thenReturn(false);
-
-        // UserDetailsService ne plante pas
-        lenient().when(userRepository.findByEmail(anyString()))
-                .thenReturn(Optional.empty());
+        lenient().when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
     }
 
     @Test
     @DisplayName("POST /api/auth/register - Doit créer un compte et retourner 201")
     void shouldRegisterAndReturn201() throws Exception {
+        // Mock de l'enregistrement
         when(registerUseCase.register(any())).thenReturn(mockUser);
-        when(loginUseCase.login(any())).thenReturn(
-                new LoginUseCase.LoginResult("jwt.token", "Bearer", 86400L)
-        );
+
+        // Mock de la génération de token par JwtPort
+        when(jwtPort.generateToken(any(User.class))).thenReturn("jwt.token");
+        when(jwtPort.getExpirationInSeconds()).thenReturn(86400L);
 
         String requestBody = """
                 {
@@ -106,7 +103,8 @@ class AuthControllerTest {
                         .content(requestBody))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.token").value("jwt.token"))
-                .andExpect(jsonPath("$.tokenType").value("Bearer"));
+                .andExpect(jsonPath("$.tokenType").value("Bearer"))
+                .andExpect(jsonPath("$.expiresIn").value(86400L));
     }
 
     @Test
