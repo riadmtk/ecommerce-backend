@@ -1,0 +1,54 @@
+openapi: 3.0.3
+info:
+  title: Product Service
+  version: 1.0.0
+  description: API pour la gestion du catalogue produit (E-commerce)
+
+paths:
+  /api/products:
+    get:
+      summary: Liste tous les produits
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductResponse'
+    post:
+      summary: Créer un nouveau produit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '201':
+          description: Produit créé
+
+components:
+  schemas:
+    ProductRequest:
+      type: object
+      required: [name, price, stock_quantity]
+      properties:
+        name: { type: string, example: "Running Shoes X1" }
+        description: { type: string, example: "High performance shoes" }
+        price: { type: number, format: double, example: 89.99 }
+        stock_quantity: { type: integer, example: 50 }
+        is_active: { type: boolean, default: true }
+
+    ProductResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+        price: { type: number }
+        stock_quantity: { type: integer }
+        is_active: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }

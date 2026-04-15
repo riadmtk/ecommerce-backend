@@ -1,16 +1,17 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${PRODUCT_DB_HOST:localhost}:${PRODUCT_DB_PORT:5432}/${PRODUCT_DB_NAME:ecommerce_products}
+    url: jdbc:postgresql://${PRODUCT_DB_HOST:localhost}:${PRODUCT_DB_PORT:5434}/${PRODUCT_DB_NAME:ecommerce_products}
     username: ${PRODUCT_DB_USERNAME:postgres}
-    password: ${PRODUCT_DB_PASSWORD:postgres}
-    driver-class-name: org.postgresql.Driver
+    password: ${PRODUCT_DB_PASSWORD:postgres123}
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+  flyway:
+    enabled: false
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
-logging:
-  level:
-    com.ecommerce.product: DEBUG
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
