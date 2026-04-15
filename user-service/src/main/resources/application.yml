@@ -19,3 +19,7 @@ server:
 jwt:
   secret: ${JWT_SECRET}
   expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
+kafka:
+  topics:
+    user-registered: user.events

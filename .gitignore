@@ -34,7 +34,7 @@ spring-shell.log
 *.iws
 *.iml
 *.ipr
-out/
+/out/
 .idea_modules/
 
 # ===== VSCODE =====
