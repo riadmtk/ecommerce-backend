@@ -3,6 +3,7 @@ package com.ecommerce.product.application.service;
 import com.ecommerce.product.domain.model.Product;
 import com.ecommerce.product.domain.port.in.UpdateProductCommand;
 import com.ecommerce.product.domain.port.out.ProductRepositoryPort;
+import com.ecommerce.product.domain.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -81,7 +82,7 @@ class UpdateProductServiceTest {
         when(productRepositoryPort.findById(productId)).thenReturn(Optional.empty());
 
         // --- ACT & ASSERT ---
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
             productService.execute(command);
         });
 

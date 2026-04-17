@@ -1,6 +1,7 @@
 package com.ecommerce.product.application.service;
 
 import com.ecommerce.product.domain.model.Product;
+import com.ecommerce.product.domain.exception.ResourceNotFoundException;
 import com.ecommerce.product.domain.port.in.*;
 import com.ecommerce.product.domain.port.out.ProductRepositoryPort;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,6 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
     private final ProductRepositoryPort productRepositoryPort;
 
     // --- POST ---
-    // CORRECTION : Renommé de createProduct à execute
     @Override
     @Transactional
     public Product execute(CreateProductCommand command) {
@@ -30,7 +30,7 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
                 .description(command.description())
                 .price(command.price())
                 .stockQuantity(command.stockQuantity())
-                .active(true) // Mis à jour avec 'active'
+                .active(true)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -45,7 +45,7 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
             throw new IllegalArgumentException("Product price must be strictly positive.");
         }
 
-        Product existingProduct = getAdminProductById(command.id());
+        Product existingProduct = getProductById(command.id());
 
         existingProduct.setName(command.name());
         existingProduct.setDescription(command.description());
@@ -60,19 +60,19 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
     @Transactional(readOnly = true)
     public Product getAdminProductById(UUID id) {
         return productRepositoryPort.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found with ID: " + id)); // Modifie l'exception si besoin
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
     }
 
     // --- GET CLIENT ---
     @Override
     @Transactional(readOnly = true)
     public Product getProductById(UUID id) {
-        Product product = getAdminProductById(id);
+        Product product = productRepositoryPort.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
 
-        if (!product.isActive()) { // Mis à jour avec 'isActive()'
-            throw new RuntimeException("Product not found with ID: " + id);
+        if (!product.isActive()) {
+            throw new ResourceNotFoundException("Product not found with ID: " + id);
         }
-
         return product;
     }
 
@@ -80,20 +80,15 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
     @Override
     @Transactional
     public void deleteProduct(UUID id) {
-        // On utilise l'Admin Get
-        Product existingProduct = getAdminProductById(id);
-
-        if (existingProduct.isActive()) {
-            existingProduct.setActive(false);
-            productRepositoryPort.save(existingProduct);
-        }
+        Product existingProduct = getProductById(id);
+        existingProduct.setActive(false);
+        productRepositoryPort.save(existingProduct);
     }
 
     // --- HARD DELETE ---
     @Override
     @Transactional
     public void hardDeleteProduct(UUID id) {
-        // On vérifie l'existence via l'Admin Get
         getAdminProductById(id);
 
         productRepositoryPort.deleteById(id);
@@ -102,7 +97,6 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
     @Override
     @Transactional
     public void decreaseStock(UUID productId, int quantity) {
-        // L'utilisation de getProductById est parfaite : elle s'assure que le produit est actif
         Product product = getProductById(productId);
 
         if (product.getStockQuantity() < quantity) {

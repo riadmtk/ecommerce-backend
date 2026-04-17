@@ -17,7 +17,8 @@ public class ProductPersistenceMapper {
                 .price(product.getPrice())
                 .stockQuantity(product.getStockQuantity())
                 .active(product.isActive())
-                // On ne mappe pas les dates ici, Hibernate s'en charge !
+                .createdAt(product.getCreatedAt())
+                .updatedAt(product.getUpdatedAt())
                 .build();
     }
 
@@ -31,8 +32,8 @@ public class ProductPersistenceMapper {
                 .price(entity.getPrice())
                 .stockQuantity(entity.getStockQuantity())
                 .active(entity.isActive())
-                .createdAt(entity.getCreatedAt()) // On récupère la date générée par la DB
-                .updatedAt(entity.getUpdatedAt()) // On récupère la date de modif générée par la DB
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 }

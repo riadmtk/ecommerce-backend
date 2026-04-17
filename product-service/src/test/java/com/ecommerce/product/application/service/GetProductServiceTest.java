@@ -2,6 +2,7 @@ package com.ecommerce.product.application.service;
 
 import com.ecommerce.product.domain.model.Product;
 import com.ecommerce.product.domain.port.out.ProductRepositoryPort;
+import com.ecommerce.product.domain.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -57,7 +58,7 @@ class GetProductServiceTest {
 
         // --- ACT & ASSERT ---
         // On vérifie que la méthode "Client" refuse de renvoyer le produit
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
             productService.getProductById(productId);
         });
 
