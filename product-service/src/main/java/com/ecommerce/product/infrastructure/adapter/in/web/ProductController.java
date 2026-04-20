@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,6 +23,7 @@ public class ProductController {
 
     private final CreateProductUseCase createProductUseCase;
     private final GetProductUseCase getProductUseCase;
+    private final GetAllProductsUseCase getAllProductsUseCase;
     private final UpdateProductUseCase updateProductUseCase;
     private final DeleteProductUseCase deleteProductUseCase;
     private final HardDeleteProductUseCase hardDeleteProductUseCase;
@@ -58,6 +60,19 @@ public class ProductController {
     public ResponseEntity<Product> getAdminProduct(@PathVariable UUID id) {
         Product product = getAdminProductUseCase.getAdminProductById(id);
         return ResponseEntity.ok(product);
+    }
+
+    // --- GET ALL ---
+    @GetMapping
+    @Operation(summary = "Get all products (Client)", description = "Retrieves a list of all active products. Returns 204 No Content if the catalog is completely empty.")
+    public ResponseEntity<List<Product>> getAllProducts() {
+        List<Product> products = getAllProductsUseCase.getAllProducts();
+
+        if (products.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(products);
     }
 
     // --- PUT ---

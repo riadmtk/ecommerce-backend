@@ -10,10 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ProductService implements CreateProductUseCase, GetProductUseCase, GetAdminProductUseCase, UpdateProductUseCase, DeleteProductUseCase, HardDeleteProductUseCase, UpdateProductStockUseCase {
+public class ProductService implements CreateProductUseCase, GetProductUseCase, GetAdminProductUseCase, GetAllProductsUseCase, UpdateProductUseCase, DeleteProductUseCase, HardDeleteProductUseCase, UpdateProductStockUseCase {
 
     private final ProductRepositoryPort productRepositoryPort;
 
@@ -74,6 +75,14 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
             throw new ResourceNotFoundException("Product not found with ID: " + id);
         }
         return product;
+    }
+
+    // --- GET LIST ---
+    @Override
+    public List<Product> getAllProducts() {
+        return productRepositoryPort.findAll().stream()
+                .filter(Product::isActive) // Règle métier : masquer les produits supprimés !
+                .toList();
     }
 
     // --- SOFT DELETE ---
