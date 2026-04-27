@@ -1,15 +1,18 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${CART_DB_HOST:localhost}:${CART_DB_PORT:5432}/${CART_DB_NAME:ecommerce_cart}
+    url: jdbc:postgresql://${CART_DB_HOST:localhost}:${CART_DB_PORT:5435}/${CART_DB_NAME:ecommerce_cart}
     username: ${CART_DB_USERNAME:postgres}
-    password: ${CART_DB_PASSWORD:postgres}
+    password: ${CART_DB_PASSWORD:postgres123}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: cart-service-group
+      auto-offset-reset: earliest
 
 logging:
   level:

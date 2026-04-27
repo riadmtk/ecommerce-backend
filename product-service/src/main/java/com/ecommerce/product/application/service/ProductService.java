@@ -4,6 +4,7 @@ import com.ecommerce.product.domain.model.Product;
 import com.ecommerce.product.domain.exception.ResourceNotFoundException;
 import com.ecommerce.product.domain.port.in.*;
 import com.ecommerce.product.domain.port.out.ProductRepositoryPort;
+import com.ecommerce.product.domain.port.out.ProductEventPublisherPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.List;
 public class ProductService implements CreateProductUseCase, GetProductUseCase, GetAdminProductUseCase, GetAllProductsUseCase, UpdateProductUseCase, DeleteProductUseCase, HardDeleteProductUseCase, UpdateProductStockUseCase {
 
     private final ProductRepositoryPort productRepositoryPort;
+    private final ProductEventPublisherPort eventPublisherPort;
 
     // --- POST ---
     @Override
@@ -92,6 +94,7 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
         Product existingProduct = getProductById(id);
         existingProduct.setActive(false);
         productRepositoryPort.save(existingProduct);
+        eventPublisherPort.publishProductDeleted(id);
     }
 
     // --- HARD DELETE ---
@@ -101,6 +104,7 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
         getAdminProductById(id);
 
         productRepositoryPort.deleteById(id);
+        eventPublisherPort.publishProductDeleted(id);
     }
 
     @Override
