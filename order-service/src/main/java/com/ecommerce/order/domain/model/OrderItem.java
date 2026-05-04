@@ -9,7 +9,8 @@ import java.util.UUID;
 @Builder
 public class OrderItem {
     private UUID productId;
-    private String productName;
+    @Builder.Default
+    private String productName = "Produit inconnu";
     private int quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;

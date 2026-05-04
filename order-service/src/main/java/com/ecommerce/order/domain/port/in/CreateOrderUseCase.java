@@ -1,11 +1,9 @@
 package com.ecommerce.order.domain.port.in;
 
 import com.ecommerce.order.domain.model.Order;
-import com.ecommerce.order.domain.model.OrderItem;
-import java.util.List;
 import java.util.UUID;
 
 public interface CreateOrderUseCase {
-    record CreateOrderCommand(UUID userId, List<OrderItem> items, String shippingAddress) {}
+    record CreateOrderCommand(UUID userId, String shippingAddress, String token) {}
     Order createOrder(CreateOrderCommand command);
 }

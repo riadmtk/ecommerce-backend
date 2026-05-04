@@ -7,5 +7,7 @@ public record UpdateProductRequest(
         String name,
         String description,
         BigDecimal price,
-        int stockQuantity
+        int stockQuantity,
+        String category,    // ajouté
+        String imageUrl      // ajouté
 ) {}

@@ -5,6 +5,7 @@ import com.ecommerce.order.domain.model.Order;
 import com.ecommerce.order.domain.model.OrderItem;
 import com.ecommerce.order.domain.model.OrderStatus;
 import com.ecommerce.order.domain.port.in.CreateOrderUseCase;
+import com.ecommerce.order.domain.port.out.CartServicePort;
 import com.ecommerce.order.domain.port.out.OrderEventPublisherPort;
 import com.ecommerce.order.domain.port.out.OrderRepositoryPort;
 import com.ecommerce.order.domain.port.out.ProductServiceClientPort;
@@ -15,11 +16,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,55 +34,83 @@ class CreateOrderServiceTest {
     @Mock private OrderRepositoryPort orderRepository;
     @Mock private ProductServiceClientPort productServiceClient;
     @Mock private OrderEventPublisherPort eventPublisher;
+    @Mock private CartServicePort cartServicePort;
     @InjectMocks private CreateOrderService createOrderService;
 
     private UUID userId;
-    private List<OrderItem> items;
+    private String token;
+    private List<OrderItem> cartItems;
 
     @BeforeEach
     void setUp() {
         userId = UUID.randomUUID();
-        items = List.of(
+        token = "dummy-jwt-token";
+        cartItems = List.of(
                 OrderItem.builder()
                         .productId(UUID.randomUUID())
-                        .productName("Test Product")
-                        .quantity(2)
-                        .unitPrice(new BigDecimal("10.00"))
-                        .totalPrice(new BigDecimal("20.00"))
+                        .productName("Laptop")
+                        .quantity(1)
+                        .unitPrice(new BigDecimal("999.99"))
+                        .totalPrice(new BigDecimal("999.99"))
                         .build()
         );
     }
 
     @Test
-    @DisplayName("Doit créer une commande avec succès")
+    @DisplayName("Doit créer une commande avec succès à partir du panier")
     void shouldCreateOrderSuccessfully() {
-        doNothing().when(productServiceClient).validateAndReserveStock(items);
+        // Given
+        when(cartServicePort.getCartItems(userId, token)).thenReturn(cartItems);
+        doNothing().when(productServiceClient).validateAndReserveStock(cartItems);
         when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
 
         CreateOrderUseCase.CreateOrderCommand command =
-                new CreateOrderUseCase.CreateOrderCommand(userId, items, "123 rue Test");
+                new CreateOrderUseCase.CreateOrderCommand(userId, "123 rue de la Paix", token);
 
+        // When
         Order result = createOrderService.createOrder(command);
 
+        // Then
         assertThat(result).isNotNull();
         assertThat(result.getUserId()).isEqualTo(userId);
         assertThat(result.getItems()).hasSize(1);
-        assertThat(result.getTotalAmount()).isEqualByComparingTo(new BigDecimal("20.00"));
+        assertThat(result.getTotalAmount()).isEqualByComparingTo(new BigDecimal("999.99"));
         assertThat(result.getStatus()).isEqualTo(OrderStatus.PENDING);
-        verify(productServiceClient).validateAndReserveStock(items);
+        assertThat(result.getShippingAddress()).isEqualTo("123 rue de la Paix");
+
+        verify(productServiceClient).validateAndReserveStock(cartItems);
+        verify(cartServicePort).clearCart(userId, token);
         verify(orderRepository).save(any(Order.class));
         verify(eventPublisher).publishOrderCreated(any(Order.class));
     }
 
     @Test
-    @DisplayName("Doit lever StockUnavailableException si validation stock échoue")
+    @DisplayName("Doit lever StockUnavailableException si la validation du stock échoue")
     void shouldThrowWhenStockValidationFails() {
-        doThrow(new RuntimeException("Stock error")).when(productServiceClient).validateAndReserveStock(items);
+        when(cartServicePort.getCartItems(userId, token)).thenReturn(cartItems);
+        doThrow(new RuntimeException("Stock error")).when(productServiceClient).validateAndReserveStock(cartItems);
+
         CreateOrderUseCase.CreateOrderCommand command =
-                new CreateOrderUseCase.CreateOrderCommand(userId, items, "adresse");
+                new CreateOrderUseCase.CreateOrderCommand(userId, "adresse", token);
+
         assertThatThrownBy(() -> createOrderService.createOrder(command))
                 .isInstanceOf(StockUnavailableException.class);
+
         verify(orderRepository, never()).save(any());
         verify(eventPublisher, never()).publishOrderCreated(any());
+        verify(cartServicePort, never()).clearCart(any(UUID.class), any(String.class)); // panier conservé
+    }
+
+    @Test
+    @DisplayName("Doit lever IllegalStateException si le panier est vide")
+    void shouldThrowWhenCartIsEmpty() {
+        when(cartServicePort.getCartItems(userId, token)).thenReturn(Collections.emptyList());
+
+        CreateOrderUseCase.CreateOrderCommand command =
+                new CreateOrderUseCase.CreateOrderCommand(userId, "adresse", token);
+
+        assertThatThrownBy(() -> createOrderService.createOrder(command))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("panier est vide");
     }
 }

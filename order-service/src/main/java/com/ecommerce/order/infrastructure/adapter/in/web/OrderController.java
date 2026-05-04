@@ -30,10 +30,10 @@ public class OrderController {
     public ResponseEntity<OrderResponse> createOrder(
             @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody CreateOrderRequest request) {
-        UUID userId = UUID.fromString(jwt.getClaim("userId"));
+        UUID userId = UUID.fromString(jwt.getSubject());  // ✅
+        String token = jwt.getTokenValue();
         Order order = createOrderUseCase.createOrder(
-                new CreateOrderUseCase.CreateOrderCommand(userId, request.items(), request.shippingAddress())
-        );
+                new CreateOrderUseCase.CreateOrderCommand(userId, request.shippingAddress(), token));
         return ResponseEntity.status(HttpStatus.CREATED).body(OrderResponse.from(order));
     }
 
@@ -45,7 +45,7 @@ public class OrderController {
 
     @GetMapping("/me")
     public ResponseEntity<List<OrderResponse>> getMyOrders(@AuthenticationPrincipal Jwt jwt) {
-        UUID userId = UUID.fromString(jwt.getClaim("userId"));
+        UUID userId = UUID.fromString(jwt.getSubject());  // ✅
         List<Order> orders = getOrderUseCase.getByUserId(userId);
         return ResponseEntity.ok(orders.stream().map(OrderResponse::from).toList());
     }

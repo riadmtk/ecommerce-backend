@@ -39,7 +39,9 @@ public class ProductController {
                 request.name(),
                 request.description(),
                 request.price(),
-                request.stockQuantity()
+                request.stockQuantity(),
+                request.category(),
+                request.imageUrl()
         );
 
         Product createdProduct = createProductUseCase.execute(command);
@@ -82,13 +84,19 @@ public class ProductController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdateProductRequest request) {
 
+        // 🟢 Log : valeurs reçues du client
+        System.out.println(">>> Category reçue : " + request.category());
+        System.out.println(">>> ImageUrl reçue : " + request.imageUrl());
+
         // Traduction : DTO Web + ID de l'URL -> Command Domaine
         UpdateProductCommand command = new UpdateProductCommand(
                 id,
                 request.name(),
                 request.description(),
                 request.price(),
-                request.stockQuantity()
+                request.stockQuantity(),
+                request.category(),   // ajouté
+                request.imageUrl()    // ajouté
         );
 
         Product updatedProduct = updateProductUseCase.execute(command);

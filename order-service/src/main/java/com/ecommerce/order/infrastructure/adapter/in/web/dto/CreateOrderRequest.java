@@ -7,10 +7,10 @@ import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 
 public record CreateOrderRequest(
-        @NotEmpty(message = "Items cannot be empty")
+       /* @NotEmpty(message = "Items cannot be empty")
         @Valid
         List<OrderItem> items,
-
+        */
         @NotBlank(message = "Shipping address is required")
         String shippingAddress
 ) {}

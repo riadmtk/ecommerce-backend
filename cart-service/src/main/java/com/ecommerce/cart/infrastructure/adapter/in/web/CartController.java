@@ -75,7 +75,10 @@ public class CartController {
     // --- HELPER METHOD ---
     // Extrait l'ID de l'utilisateur depuis le token JWT de manière centralisée
     private UUID extractUserId(Jwt jwt) {
-        // "sub" (Subject) est le standard JWT pour stocker l'ID unique de l'utilisateur
-        return UUID.fromString(jwt.getSubject());
+        String userId = jwt.getSubject();
+        if (userId == null || userId.isBlank()) {
+            throw new IllegalArgumentException("Token JWT invalide : aucun identifiant utilisateur trouvé (sub)");
+        }
+        return UUID.fromString(userId);
     }
 }

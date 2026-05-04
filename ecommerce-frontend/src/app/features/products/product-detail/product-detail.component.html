@@ -1,0 +1,37 @@
+<div class="product-detail-container">
+
+  <button class="btn-back" routerLink="/products">← Retour au catalogue</button>
+
+  <div *ngIf="isLoading" class="loading">Chargement...</div>
+  <div *ngIf="errorMessage" class="error-banner">{{ errorMessage }}</div>
+
+  <div *ngIf="!isLoading && product" class="product-detail">
+    <div class="product-image">
+      <img
+        [src]="product.imageUrl || 'assets/placeholder.png'"
+        [alt]="product.name"
+      />
+    </div>
+    <div class="product-info">
+      <h1>{{ product.name }}</h1>
+      <span class="category-badge" *ngIf="product.category">{{ product.category }}</span>
+      <p class="description">{{ product.description }}</p>
+      <div class="price-stock">
+        <span class="price">{{ product.price | currency:'EUR' }}</span>
+        <span
+          class="stock"
+          [class.out-of-stock]="product.stockQuantity === 0"
+        >
+          {{ product.stockQuantity > 0 ? product.stockQuantity + ' en stock' : 'Rupture de stock' }}
+        </span>
+      </div>
+      <button
+        class="btn-add-cart"
+        [disabled]="product.stockQuantity === 0"
+      >
+        {{ product.stockQuantity > 0 ? 'Ajouter au panier' : 'Indisponible' }}
+      </button>
+    </div>
+  </div>
+
+</div>

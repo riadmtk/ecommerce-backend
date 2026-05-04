@@ -8,5 +8,7 @@ public record UpdateProductCommand(
         String name,
         String description,
         BigDecimal price,
-        int stockQuantity
+        int stockQuantity,
+        String category,
+        String imageUrl
 ) {}

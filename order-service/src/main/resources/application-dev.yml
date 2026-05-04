@@ -11,13 +11,20 @@ spring:
     bootstrap-servers: localhost:9092
 
 jwt:
-  secret: devSecretKeyForLocalTestingOnly-256bits!
+  secret: "devSecretKeyForLocalTestingOnly-256bits!"
 
 product:
   service:
-    url: http://localhost:8082
+    url: ${PRODUCT_SERVICE_URL:http://localhost:8082}
+
+cart:
+  service:
+    url: ${CART_SERVICE_URL:http://localhost:8084}
 
 logging:
   level:
     com.ecommerce.order: DEBUG
+    org.springframework.web.cors: DEBUG
     org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

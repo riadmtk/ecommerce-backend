@@ -17,3 +17,8 @@ spring:
 logging:
   level:
     com.ecommerce.cart: DEBUG
+    org.springframework.web.cors: DEBUG
+    org.springframework.security: DEBUG
+
+jwt:
+  secret: "devSecretKeyForLocalTestingOnly-256bits!"

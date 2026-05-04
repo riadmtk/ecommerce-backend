@@ -33,11 +33,18 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
                 .description(command.description())
                 .price(command.price())
                 .stockQuantity(command.stockQuantity())
+                .category(command.category())   // ajouté
+                .imageUrl(command.imageUrl())   // ajouté
                 .active(true)
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return productRepositoryPort.save(newProduct);
+        Product createdProduct = productRepositoryPort.save(newProduct);
+
+        // 🆕 Publication de l’événement "ProductCreated"
+        eventPublisherPort.publishProductCreated(createdProduct);
+
+        return createdProduct;
     }
 
     // --- PUT ---
@@ -54,8 +61,19 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
         existingProduct.setDescription(command.description());
         existingProduct.setPrice(command.price());
         existingProduct.setStockQuantity(command.stockQuantity());
+        existingProduct.setCategory(command.category());   // ← ajouté
+        existingProduct.setImageUrl(command.imageUrl());   // ← ajouté
 
-        return productRepositoryPort.save(existingProduct);
+        // 🟢 Log : valeurs après application des setters
+        System.out.println(">>> Category après set : " + existingProduct.getCategory());
+        System.out.println(">>> ImageUrl après set : " + existingProduct.getImageUrl());
+
+        Product updatedProduct = productRepositoryPort.save(existingProduct);
+
+        // 🆕 Publication de l’événement "ProductUpdated"
+        eventPublisherPort.publishProductUpdated(updatedProduct);
+
+        return updatedProduct;
     }
 
     // --- GET ADMIN (Interne) ---

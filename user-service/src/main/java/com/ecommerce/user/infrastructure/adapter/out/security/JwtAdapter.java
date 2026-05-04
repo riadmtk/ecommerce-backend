@@ -39,7 +39,12 @@ public class JwtAdapter implements JwtPort {
 
     @Override
     public String extractEmail(String token) {
-        return getClaims(token).getSubject();
+        return getClaims(token).get("email", String.class); // Lire la claim "email"
+    }
+
+    @Override
+    public String extractUserId(String token) {
+        return getClaims(token).getSubject(); // Le subject contient l'UUID
     }
 
     @Override
