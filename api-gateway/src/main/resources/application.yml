@@ -19,7 +19,7 @@ spring:
         - id: search-service
           uri: http://search-service:8083
           predicates:
-            - Path=/api/search/**
+            - Path=/api/v1/search/**
 
         - id: cart-service
           uri: http://cart-service:8084
@@ -61,3 +61,5 @@ springdoc:
         url: /v3/api-docs/cart
       - name: 🧾 Order Service
         url: /v3/api-docs/order
+      - name: 🧾 Search Service
+        url: /v3/api-docs/search

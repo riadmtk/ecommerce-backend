@@ -11,10 +11,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Disable CSRF protection since this is a stateless REST API
                 .csrf(csrf -> csrf.disable())
-                // Allow all requests to pass through without authentication (for now)
                 .authorizeHttpRequests(auth -> auth
+                        // Allow Swagger UI and OpenAPI docs to load without authentication
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        // Allow all other requests for now (change this later when you implement JWT validation)
                         .anyRequest().permitAll()
                 );
 

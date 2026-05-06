@@ -13,6 +13,10 @@ spring:
 jwt:
   secret: "devSecretKeyForLocalTestingOnly-256bits!"
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
 product:
   service:
     url: ${PRODUCT_SERVICE_URL:http://localhost:8082}
