@@ -9,4 +9,5 @@ public interface OrderRepositoryPort {
     Order save(Order order);
     Optional<Order> findById(UUID id);
     List<Order> findByUserId(UUID userId);
+    List<Order> findAll();
 }

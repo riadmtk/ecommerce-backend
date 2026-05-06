@@ -2,17 +2,28 @@ package com.ecommerce.product.infrastructure.adapter.in.web;
 
 import com.ecommerce.product.domain.model.Product;
 import com.ecommerce.product.domain.port.in.*;
+import com.ecommerce.product.domain.port.out.StoragePort;
 import com.ecommerce.product.infrastructure.adapter.in.web.dto.CreateProductRequest;
 import com.ecommerce.product.infrastructure.adapter.in.web.dto.UpdateProductRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -29,6 +40,42 @@ public class ProductController {
     private final HardDeleteProductUseCase hardDeleteProductUseCase;
     private final GetAdminProductUseCase getAdminProductUseCase;
     private final UpdateProductStockUseCase updateProductStockUseCase;
+    private final StoragePort storagePort;   // ← à injecter (via @RequiredArgsConstructor)
+
+
+    // --- UPLOAD IMAGE ---
+    @PostMapping("/upload-image")
+    @Operation(summary = "Upload an image")
+    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
+        String imageUrl = storagePort.store(file);
+        return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+    }
+
+    @GetMapping("/images/{filename}")
+    @Operation(summary = "Récupérer une image produit")
+    public ResponseEntity<Resource> getImage(@PathVariable String filename) {
+        Path filePath = Paths.get("uploads", "products").resolve(filename).normalize();
+        Resource resource;
+        try {
+            resource = new UrlResource(filePath.toUri());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("URL du fichier incorrecte : " + filename, e);
+        }
+
+        if (!resource.exists() || !resource.isReadable()) {
+            throw new RuntimeException("Fichier introuvable : " + filename);
+        }
+
+        String contentType = "application/octet-stream";
+        try {
+            contentType = Files.probeContentType(filePath);
+        } catch (IOException ignored) {
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(resource);
+    }
 
     // --- POST ---
     @PostMapping

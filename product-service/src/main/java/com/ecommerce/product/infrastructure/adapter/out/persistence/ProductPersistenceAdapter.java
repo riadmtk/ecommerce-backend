@@ -30,6 +30,13 @@ public class ProductPersistenceAdapter implements ProductRepositoryPort {
     }
 
     @Override
+    public List<Product> findAllSortedByDate() {
+        return jpaRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Optional<Product> findById(UUID id) {
         return jpaRepository.findById(id).map(mapper::toDomain);
     }

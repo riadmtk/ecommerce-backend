@@ -3,6 +3,7 @@ package com.ecommerce.cart.infrastructure.adapter.in.web;
 import com.ecommerce.cart.domain.model.Cart;
 import com.ecommerce.cart.domain.port.in.*;
 import com.ecommerce.cart.infrastructure.adapter.in.web.dto.AddToCartRequest;
+import com.ecommerce.cart.infrastructure.adapter.in.web.dto.UpdateQuantityRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,8 @@ public class CartController {
     private final GetCartUseCase getCartUseCase;
     private final RemoveItemFromCartUseCase removeItemFromCartUseCase;
     private final ClearCartUseCase clearCartUseCase;
+    private final UpdateCartItemQuantityUseCase updateCartItemQuantityUseCase;   // ← ajout
+
 
     // --- GET MY CART ---
     @GetMapping
@@ -80,5 +83,18 @@ public class CartController {
             throw new IllegalArgumentException("Token JWT invalide : aucun identifiant utilisateur trouvé (sub)");
         }
         return UUID.fromString(userId);
+    }
+
+    @PutMapping("/items/{productId}")
+    @Operation(summary = "Mettre à jour la quantité d'un article du panier")
+    public ResponseEntity<Cart> updateCartItemQuantity(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable UUID productId,
+            @RequestBody UpdateQuantityRequest request) {
+        UUID userId = UUID.fromString(jwt.getSubject());
+        UpdateCartItemQuantityUseCase.UpdateCartItemQuantityCommand command =
+                new UpdateCartItemQuantityUseCase.UpdateCartItemQuantityCommand(userId, productId, request.quantity());
+        Cart updatedCart = updateCartItemQuantityUseCase.updateItemQuantity(command);
+        return ResponseEntity.ok(updatedCart);
     }
 }

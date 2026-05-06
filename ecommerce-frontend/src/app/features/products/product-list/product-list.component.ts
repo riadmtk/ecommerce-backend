@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProductService } from '../../../core/services/product.service';
 import { Product } from '../../../core/models/product.model';
+import { CurrencyMadPipe } from '../../../shared/pipes/currency-mad.pipe';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, CurrencyMadPipe],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss']
 })

@@ -1,11 +1,11 @@
 package com.ecommerce.order.infrastructure.adapter.in.web;
 
 import com.ecommerce.order.domain.model.Order;
-import com.ecommerce.order.domain.port.in.CancelOrderUseCase;
-import com.ecommerce.order.domain.port.in.CreateOrderUseCase;
-import com.ecommerce.order.domain.port.in.GetOrderUseCase;
+import com.ecommerce.order.domain.model.OrderStatus;
+import com.ecommerce.order.domain.port.in.*;
 import com.ecommerce.order.infrastructure.adapter.in.web.dto.CreateOrderRequest;
 import com.ecommerce.order.infrastructure.adapter.in.web.dto.OrderResponse;
+import com.ecommerce.order.infrastructure.adapter.in.web.dto.UpdateStatusRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +25,8 @@ public class OrderController {
     private final CreateOrderUseCase createOrderUseCase;
     private final GetOrderUseCase getOrderUseCase;
     private final CancelOrderUseCase cancelOrderUseCase;
+    private final GetAllOrdersUseCase getAllOrdersUseCase;
+    private final UpdateOrderStatusUseCase updateOrderStatusUseCase;
 
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(
@@ -53,6 +55,32 @@ public class OrderController {
     @PostMapping("/{id}/cancel")
     public ResponseEntity<OrderResponse> cancelOrder(@PathVariable UUID id) {
         Order order = cancelOrderUseCase.cancelOrder(id);
+        return ResponseEntity.ok(OrderResponse.from(order));
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<OrderResponse>> getAllOrders() {
+        return ResponseEntity.ok(getAllOrdersUseCase.getAllOrders().stream()
+                .map(OrderResponse::from).toList());
+    }
+
+    @PostMapping("/{id}/deliver")
+    public ResponseEntity<OrderResponse> deliverOrder(@PathVariable UUID id) {
+        Order order = getOrderUseCase.getById(id);
+        if (order.getStatus() != OrderStatus.SHIPPED) {
+            throw new IllegalStateException("La commande doit être expédiée pour être livrée");
+        }
+        Order updated = updateOrderStatusUseCase.updateStatus(id, OrderStatus.DELIVERED);
+        return ResponseEntity.ok(OrderResponse.from(updated));
+    }
+
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<OrderResponse> updateStatus(
+            @PathVariable UUID id,
+            @RequestBody UpdateStatusRequest request) {
+        Order order = updateOrderStatusUseCase.updateStatus(id, request.newStatus());
         return ResponseEntity.ok(OrderResponse.from(order));
     }
 }

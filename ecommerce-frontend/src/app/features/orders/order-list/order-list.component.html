@@ -19,7 +19,7 @@
       </div>
       <div class="order-body">
         <p>{{ order.items.length }} article(s)</p>
-        <p class="order-total">Total : {{ order.totalAmount | currency:'EUR' }}</p>
+        <p class="order-total">Total : {{ order.totalAmount | currencyMad }}</p>
         <p class="order-date">{{ order.createdAt | date:'dd/MM/yyyy' }}</p>
       </div>
       <a [routerLink]="['/orders', order.id]" class="btn-detail">Voir le détail</a>

@@ -1,86 +1,285 @@
 .product-detail-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 24px;
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 0 1rem;
 
-  .btn-back {
-    background: none;
+  .detail-actions-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    .btn-back {
+      padding: 0.5rem 1rem;
+      background: #f3f4f6;
+      color: #333;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+
+      &:hover {
+        background: #e5e7eb;
+      }
+    }
+
+    .btn-edit {
+      padding: 0.5rem 1.2rem;
+      background: #4f46e5;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background 0.2s;
+      margin-right: 5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+
+      &:hover {
+        background: #4338ca;
+      }
+    }
+
+    .btn-delete {
+    padding: 0.5rem 1.2rem;
+    background: #dc2626;
+    color: white;
     border: none;
-    color: #666;
+    border-radius: 8px;
+    font-weight: 500;
     cursor: pointer;
-    font-size: 14px;
-    margin-bottom: 24px;
-    padding: 0;
+    transition: background 0.2s;
 
-    &:hover { color: #333; }
+    &:hover:not(:disabled) {
+      background: #b91c1c;
+    }
+
+    &:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+  }
+  }
+
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: #888;
+  }
+
+  .error-banner {
+    background: #fef2f2;
+    color: #991b1b;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
   }
 
   .product-detail {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-
-    @media (max-width: 600px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .product-image img {
-    width: 100%;
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    background: white;
     border-radius: 12px;
-    object-fit: cover;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+
+    .product-image {
+      flex: 1 1 300px;
+      max-width: 400px;
+
+      img {
+        width: 100%;
+        border-radius: 12px;
+        object-fit: cover;
+        max-height: 400px;
+      }
+    }
+
+    .product-info {
+      flex: 1 1 300px;
+
+      h1 {
+        font-size: 2rem;
+        color: #1a1a2e;
+        margin-bottom: 0.5rem;
+      }
+
+      .category-badge {
+        display: inline-block;
+        background: #4f46e5;
+        color: white;
+        padding: 0.2rem 0.7rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+      }
+
+      .description {
+        color: #555;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+      }
+
+      .price-stock {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+
+        .price {
+          font-size: 2rem;
+          font-weight: bold;
+          color: #1a1a2e;
+        }
+
+        .stock {
+          color: #555;
+          font-size: 1rem;
+
+          &.out-of-stock {
+            color: #dc2626;
+            font-weight: 600;
+          }
+        }
+      }
+
+      .btn-add-cart {
+        padding: 0.75rem 2rem;
+        background: #4f46e5;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover:not(:disabled) {
+          background: #4338ca;
+        }
+
+        &:disabled {
+          background: #ccc;
+          cursor: not-allowed;
+        }
+      }
+    }
   }
 
-  .product-info {
-    h1 { font-size: 28px; margin-bottom: 8px; }
+  // Message de succès
+.cart-success-banner {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #065f46;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  z-index: 2000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-weight: 500;
+  animation: slideIn 0.3s ease-out;
+}
 
-    .category-badge {
-      background: #e0e7ff;
-      color: #4f46e5;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-    }
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
 
-    .description {
-      margin: 16px 0;
-      color: #555;
-      line-height: 1.6;
-    }
+// Modale
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
 
-    .price-stock {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 24px;
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  min-width: 350px;
+  max-width: 90vw;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
 
-      .price {
-        font-size: 28px;
-        font-weight: bold;
-        color: #1a1a2e;
+  h2 {
+    margin-bottom: 1rem;
+  }
+
+  .quantity-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+
+    button {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #ddd;
+      background: #f9f9fb;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
       }
-
-      .stock {
-        color: #16a34a;
-        font-size: 14px;
-
-        &.out-of-stock { color: #dc2626; }
-      }
     }
 
-    .btn-add-cart {
-      width: 100%;
-      padding: 14px;
+    input {
+      width: 70px;
+      text-align: center;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+  }
+
+  .stock-info {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+
+    button {
+      padding: 0.6rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-cancel {
+      background: #f3f4f6;
+      color: #333;
+    }
+
+    .btn-confirm {
       background: #4f46e5;
       color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.2s;
-
-      &:hover:not(:disabled) { background: #4338ca; }
-      &:disabled { background: #ccc; cursor: not-allowed; }
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
     }
   }
+}
 }

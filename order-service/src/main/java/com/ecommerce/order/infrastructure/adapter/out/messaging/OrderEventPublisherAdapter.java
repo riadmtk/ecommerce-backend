@@ -9,10 +9,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -37,7 +35,14 @@ public class OrderEventPublisherAdapter implements OrderEventPublisherPort {
         payload.put("userId", order.getUserId().toString());
         payload.put("totalAmount", order.getTotalAmount());
         payload.put("status", order.getStatus().name());
-        // On peut aussi ajouter les items si nécessaire, mais le payload doit rester lisible
+        // ➕ Ajouter les articles pour la mise à jour du stock
+        List<Map<String, Object>> items = order.getItems().stream().map(item -> {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("productId", item.getProductId().toString());
+            map.put("quantity", item.getQuantity());
+            return map;
+        }).collect(Collectors.toList());
+        payload.put("items", items);
 
         event.put("payload", payload);
         kafkaTemplate.send(orderEventsTopic, order.getId().toString(), event);
@@ -60,5 +65,31 @@ public class OrderEventPublisherAdapter implements OrderEventPublisherPort {
         event.put("payload", payload);
         kafkaTemplate.send(orderEventsTopic, order.getId().toString(), event);
         log.info("OrderCancelled event sent for order {}", order.getId());
+    }
+
+    @Override
+    public void publishOrderRefunded(Order order) {
+        Map<String, Object> event = new LinkedHashMap<>();
+        event.put("eventId", UUID.randomUUID().toString());
+        event.put("eventType", "OrderRefunded");
+        event.put("timestamp", Instant.now().toString());
+        event.put("service", "order-service");
+        event.put("version", "1.0");
+
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("orderId", order.getId().toString());
+        payload.put("userId", order.getUserId().toString());
+        // items nécessaires pour ré-augmenter le stock
+        List<Map<String, Object>> items = order.getItems().stream().map(item -> {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("productId", item.getProductId().toString());
+            map.put("quantity", item.getQuantity());
+            return map;
+        }).collect(Collectors.toList());
+        payload.put("items", items);
+
+        event.put("payload", payload);
+        kafkaTemplate.send(orderEventsTopic, order.getId().toString(), event);
+        log.info("OrderRefunded event sent for order {}", order.getId());
     }
 }

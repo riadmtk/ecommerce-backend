@@ -7,7 +7,11 @@ import { Order } from '../models/order.model';
 @Injectable({ providedIn: 'root' })
 export class OrderService {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
+
+  createOrder(shippingAddress: string): Observable<Order> {
+    return this.http.post<Order>(`${environment.services.orders}`, { shippingAddress });
+  }
 
   getMyOrders(): Observable<Order[]> {
     console.log('getMyOrders called');
@@ -16,5 +20,20 @@ export class OrderService {
 
   getById(id: string): Observable<Order> {
     return this.http.get<Order>(`${environment.services.orders}/${id}`);
+  }
+
+  getAllOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${environment.services.orders}/all`);
+  }
+  deliverOrder(orderId: string): Observable<Order> {
+    return this.http.post<Order>(`${environment.services.orders}/${orderId}/deliver`, {});
+  }
+
+  updateStatus(orderId: string, newStatus: string): Observable<Order> {
+    return this.http.patch<Order>(`${environment.services.orders}/${orderId}/status`, { newStatus });
+  }
+
+  cancelOrder(orderId: string): Observable<Order> {
+    return this.http.post<Order>(`${environment.services.orders}/${orderId}/cancel`, {});
   }
 }

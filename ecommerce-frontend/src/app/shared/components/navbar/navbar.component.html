@@ -6,9 +6,16 @@
   <!-- Nouveau groupe de liens de navigation -->
   <div class="navbar-nav">
     <a routerLink="/products" routerLinkActive="active">Catalogue</a>
+    <a routerLink="/products/add" *ngIf="isAdmin$ | async" routerLinkActive="active">
+      Ajouter produit
+    </a>
+
+    <a routerLink="/admin/orders" *ngIf="isAdmin$ | async" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Gestion des commandes</a>
+
+    <a routerLink="/cart" *ngIf="!(isAdmin$ | async)" routerLinkActive="active">Mon panier</a>
 
     <ng-container *ngIf="authService.isLoggedIn()">
-      <a routerLink="/orders" routerLinkActive="active">Mes Commandes</a>
+      <a routerLink="/orders" *ngIf="!(isAdmin$ | async)" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Mes Commandes</a>
       <a routerLink="/profile" routerLinkActive="active">Mon Profil</a>
     </ng-container>
 

@@ -100,8 +100,8 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
     // --- GET LIST ---
     @Override
     public List<Product> getAllProducts() {
-        return productRepositoryPort.findAll().stream()
-                .filter(Product::isActive) // Règle métier : masquer les produits supprimés !
+        return productRepositoryPort.findAllSortedByDate().stream()
+                .filter(Product::isActive) // toujours filtrer les inactifs
                 .toList();
     }
 

@@ -20,13 +20,16 @@ public class OrderStatusService implements UpdateOrderStatusUseCase {
     private final OrderEventPublisherPort eventPublisher;
 
     @Override
-    @Transactional
     public Order updateStatus(UUID orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
         Order updatedOrder = order.updateStatus(newStatus);
         updatedOrder = orderRepository.save(updatedOrder);
-        // Publier un événement de changement de statut (optionnel)
+
+        // Publier un événement si le nouveau statut est REFUNDED
+        if (newStatus == OrderStatus.REFUNDED) {
+            eventPublisher.publishOrderRefunded(updatedOrder);
+        }
         return updatedOrder;
     }
 }

@@ -13,8 +13,27 @@ export class AuthService {
   currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient, private router: Router) {
-    // On ne fait plus d'appel HTTP dans le constructeur
-    this.loadUserFromStorage();
+    // Récupération de l'utilisateur depuis le token présent au démarrage
+    this.initUserFromStoredToken();
+  }
+
+  private initUserFromStoredToken(): void {
+    const token = this.getToken();
+    if (token && !this.isTokenExpired(token)) {
+      const payload = this.decodeToken(token);
+      if (payload) {
+        // Construire un objet User partiel avec les données du token
+        const user: User = {
+          id: payload.userId || payload.sub,   // selon la structure de votre token
+          firstName: '',                       // sera complété plus tard si nécessaire
+          lastName: '',
+          email: payload.email || '',
+          role: payload.role || 'USER',
+          createdAt: ''
+        };
+        this.currentUserSubject.next(user);
+      }
+    }
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {
@@ -22,8 +41,13 @@ export class AuthService {
       .pipe(
         tap(response => {
           localStorage.setItem(this.TOKEN_KEY, response.token);
-          // Charger le profil après login avec le token déjà en localStorage
-          this.fetchCurrentUser();
+          // On met à jour le sujet avec les données de la réponse (si présentes)
+          if (response.user) {
+            this.currentUserSubject.next(response.user);
+          } else {
+            // sinon, extraire du token
+            this.initUserFromStoredToken();
+          }
         })
       );
   }
@@ -57,20 +81,11 @@ export class AuthService {
     if (!token || this.isTokenExpired(token)) return;
 
     this.http.get<User>(`${environment.services.users}/me`, {
-      headers: { Authorization: `Bearer ${token}` }  // ← token ajouté manuellement ici
+      headers: { Authorization: `Bearer ${token}` }
     }).subscribe({
       next: user => this.currentUserSubject.next(user),
       error: () => this.logout()
     });
-  }
-
-  private loadUserFromStorage(): void {
-    // Juste vérifier si le token est valide, sans appel HTTP
-    const token = this.getToken();
-    if (token && !this.isTokenExpired(token)) {
-      // Token valide — on ne fait pas d'appel HTTP ici
-      // Le profil sera chargé par fetchCurrentUser() après login
-    }
   }
 
   private decodeToken(token: string): any {

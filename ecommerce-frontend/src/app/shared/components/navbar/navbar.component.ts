@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
+import { Observable, map } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -12,7 +13,13 @@ import { AuthService } from '../../../core/auth/auth.service';
 })
 export class NavbarComponent {
 
-  constructor(public authService: AuthService) {}
+  isAdmin$: Observable<boolean>;
+
+  constructor(public authService: AuthService) {
+    this.isAdmin$ = this.authService.currentUser$.pipe(
+      map(user => user?.role === 'ADMIN')
+    );
+  }
 
   logout(): void {
     this.authService.logout();

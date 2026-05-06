@@ -10,7 +10,7 @@
       <div class="product-info">
         <h3>{{ product.name }}</h3>
         <p class="category" *ngIf="product.category">{{ product.category }}</p>
-        <p class="price">{{ product.price | currency:'EUR' }}</p>
+        <p class="price">{{ product.price | currencyMad }}</p>
         <p class="stock" [class.out-of-stock]="product.stockQuantity === 0">
           {{ product.stockQuantity > 0 ? product.stockQuantity + ' en stock' : 'Rupture de stock' }}
         </p>

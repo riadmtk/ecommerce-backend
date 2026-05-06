@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { OrderService } from '../../../core/services/order.service';
 import { Order } from '../../../core/models/order.model';
+import { CurrencyMadPipe } from '../../../shared/pipes/currency-mad.pipe';
+
 
 @Component({
   selector: 'app-order-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, CurrencyMadPipe],
   templateUrl: './order-list.component.html',
   styleUrls: ['./order-list.component.scss']
 })

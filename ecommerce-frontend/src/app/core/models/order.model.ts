@@ -3,9 +3,10 @@ export interface Order {
   userId: string;
   items: OrderItem[];
   totalAmount: number;
-  status: 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'REFUNDED';
+  status: 'PENDING' | 'PAID' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
   createdAt: string;
   updatedAt: string;
+  shippingAddress?: string;   // ← ajout
 }
 
 export interface OrderItem {

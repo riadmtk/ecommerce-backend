@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class CartService implements AddProductToCartUseCase, GetCartUseCase, RemoveItemFromCartUseCase, ClearCartUseCase, RemoveProductFromAllCartsUseCase {
+public class CartService implements AddProductToCartUseCase, GetCartUseCase, RemoveItemFromCartUseCase, ClearCartUseCase, RemoveProductFromAllCartsUseCase, UpdateCartItemQuantityUseCase {
 
     private final CartRepositoryPort cartRepositoryPort;
     private final ProductClientPort productClientPort;
@@ -97,5 +97,29 @@ public class CartService implements AddProductToCartUseCase, GetCartUseCase, Rem
             cart.setUpdatedAt(LocalDateTime.now());
             cartRepositoryPort.save(cart);
         }
+    }
+
+    @Override
+    public Cart updateItemQuantity(UpdateCartItemQuantityCommand command) {
+        Cart cart = cartRepositoryPort.findByUserId(command.userId())
+                .orElseThrow(() -> new IllegalStateException("Panier introuvable"));
+
+        CartItem item = cart.getItems().stream()
+                .filter(i -> i.getProductId().equals(command.productId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Produit non présent dans le panier"));
+
+        if (command.quantity() <= 0) {
+            cart.getItems().remove(item);
+        } else {
+            int availableStock = productClientPort.getAvailableStock(command.productId());
+            if (command.quantity() > availableStock) {
+                throw new IllegalArgumentException("Stock insuffisant");
+            }
+            item.setQuantity(command.quantity());
+        }
+
+        cart.setUpdatedAt(LocalDateTime.now());
+        return cartRepositoryPort.save(cart);
     }
 }
