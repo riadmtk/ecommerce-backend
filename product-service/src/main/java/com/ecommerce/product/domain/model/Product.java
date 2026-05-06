@@ -13,6 +13,8 @@ import lombok.*;
 public class Product {
     private UUID id;
     private String name;
+    private String category;
+    private String imageUrl;
     private String description;
     private BigDecimal price; // Changement effectué ici
     private int stockQuantity;

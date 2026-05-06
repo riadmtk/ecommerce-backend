@@ -19,6 +19,7 @@ spring:
 logging:
   level:
     com.ecommerce.user: DEBUG
+    org.springframework.web.cors: DEBUG
     org.springframework.security: DEBUG
     com.ecommerce.user.infrastructure.adapter.out.messaging: DEBUG
     org.springframework.kafka: INFO

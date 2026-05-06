@@ -1,7 +1,11 @@
+server:
+  port: 8080
+
 spring:
   cloud:
     gateway:
       routes:
+        # --- YOUR API ROUTES (Using localhost) ---
         - id: user-service
           uri: http://localhost:8081
           predicates:
@@ -10,38 +14,43 @@ spring:
         - id: product-service
           uri: http://localhost:8082
           predicates:
-            - Path=/api/products/**
-
-        - id: search-service
-          uri: http://localhost:8083
-          predicates:
-            - Path=/api/search/**
+            - Path=/api/v1/products/**
 
         - id: cart-service
           uri: http://localhost:8084
           predicates:
-            - Path=/api/cart/**
+            - Path=/api/v1/carts/**
 
         - id: order-service
           uri: http://localhost:8085
           predicates:
             - Path=/api/orders/**
 
-        - id: payment-service
-          uri: http://localhost:8086
+        # --- OPENAPI / SWAGGER ROUTES (Using localhost) ---
+        - id: user-openapi
+          uri: http://localhost:8081
           predicates:
-            - Path=/api/payments/**
+            - Path=/v3/api-docs/user
+          filters:
+            - RewritePath=/v3/api-docs/user, /v3/api-docs
 
-        - id: notification-service
-          uri: http://localhost:8087
+        - id: product-openapi
+          uri: http://localhost:8082
           predicates:
-            - Path=/api/notifications/**
+            - Path=/v3/api-docs/product
+          filters:
+            - RewritePath=/v3/api-docs/product, /v3/api-docs
 
-        - id: wishlist-service
-          uri: http://localhost:8088
+        - id: cart-openapi
+          uri: http://localhost:8084
           predicates:
-            - Path=/api/wishlist/**
+            - Path=/v3/api-docs/cart
+          filters:
+            - RewritePath=/v3/api-docs/cart, /v3/api-docs
 
-logging:
-  level:
-    org.springframework.cloud.gateway: DEBUG
+        - id: order-openapi
+          uri: http://localhost:8085
+          predicates:
+            - Path=/v3/api-docs/order
+          filters:
+            - RewritePath=/v3/api-docs/order, /v3/api-docs

@@ -1,6 +1,8 @@
 spring:
   application:
     name: api-gateway
+  profiles:
+    active: dev
   cloud:
     gateway:
       routes:
@@ -12,7 +14,7 @@ spring:
         - id: product-service
           uri: http://product-service:8082
           predicates:
-            - Path=/api/products/**
+            - Path=/api/v1/products/**
 
         - id: search-service
           uri: http://search-service:8083
@@ -22,7 +24,7 @@ spring:
         - id: cart-service
           uri: http://cart-service:8084
           predicates:
-            - Path=/api/cart/**
+            - Path=/api/v1/carts/**
 
         - id: order-service
           uri: http://order-service:8085
@@ -47,6 +49,15 @@ spring:
 server:
   port: 8080
 
-jwt:
-  secret: ${JWT_SECRET}
-  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: 👤 User Service
+        url: /v3/api-docs/user
+      - name: 📦 Product Service
+        url: /v3/api-docs/product
+      - name: 🛒 Cart Service
+        url: /v3/api-docs/cart
+      - name: 🧾 Order Service
+        url: /v3/api-docs/order

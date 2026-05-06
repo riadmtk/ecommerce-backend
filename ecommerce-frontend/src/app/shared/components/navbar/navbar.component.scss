@@ -1,0 +1,61 @@
+.navbar {
+  display: flex;
+  align-items: center;            // supprimé justify-content: space-between
+  padding: 16px 32px;
+  background: #1a1a2e;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  .navbar-brand a {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  // Nouveau conteneur pour les liens principaux (gauche)
+  .navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-left: 32px;            // espacement après le logo
+
+    a {
+      color: #ccc;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+
+      &:hover, &.active { color: white; }
+
+      &.btn-register {
+        background: #4f46e5;
+        color: white;
+        padding: 8px 18px;
+        border-radius: 8px;
+
+        &:hover { background: #4338ca; }
+      }
+    }
+  }
+
+  // Conteneur pour le bouton Déconnexion (droite)
+  .navbar-links {
+    margin-left: auto;            // pousse à droite
+
+    .btn-logout {
+      background: none;
+      border: 1px solid #ccc;
+      color: #ccc;
+      padding: 6px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+
+      &:hover { border-color: white; color: white; }
+    }
+  }
+}

@@ -16,6 +16,8 @@ public class ProductPersistenceMapper {
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .stockQuantity(product.getStockQuantity())
+                .category(product.getCategory())          // ← doit être présent
+                .imageUrl(product.getImageUrl())          // ← doit être présent
                 .active(product.isActive())
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
@@ -31,6 +33,8 @@ public class ProductPersistenceMapper {
                 .description(entity.getDescription())
                 .price(entity.getPrice())
                 .stockQuantity(entity.getStockQuantity())
+                .category(entity.getCategory())          // ← doit être présent
+                .imageUrl(entity.getImageUrl())          // ← doit être présent
                 .active(entity.isActive())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())

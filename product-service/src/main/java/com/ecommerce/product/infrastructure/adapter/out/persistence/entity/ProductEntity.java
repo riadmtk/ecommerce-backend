@@ -23,6 +23,12 @@ public class ProductEntity {
     @Column(nullable = false)
     private String name;
 
+    @Column(name = "category")
+    private String category;
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(length = 1000)
     private String description;
 

@@ -11,9 +11,21 @@ spring:
     enabled: false
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  web:
+    resources:
+      static-locations: file:./uploads/
 
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-jwt:
-  secret: "devSecretKeyForLocalTestingOnly-256bits!"
+
+
+logging:
+  level:
+    org.springframework.web.cors: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

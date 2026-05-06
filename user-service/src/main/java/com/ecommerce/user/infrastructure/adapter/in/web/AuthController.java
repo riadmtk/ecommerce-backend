@@ -1,9 +1,11 @@
 package com.ecommerce.user.infrastructure.adapter.in.web;
 
 import com.ecommerce.user.domain.model.User;
+import com.ecommerce.user.domain.port.in.GetUserUseCase;
 import com.ecommerce.user.domain.port.in.LoginUseCase;
 import com.ecommerce.user.domain.port.in.RegisterUseCase;
 import com.ecommerce.user.domain.port.out.JwtPort;
+import com.ecommerce.user.domain.port.out.UserEventPublisherPort;
 import com.ecommerce.user.infrastructure.adapter.in.web.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +24,8 @@ public class AuthController {
     private final RegisterUseCase registerUseCase;
     private final LoginUseCase loginUseCase;
     private final JwtPort jwtPort;   // ← Ajout du port JWT
+    private final UserEventPublisherPort userEventPublisherPort;
+    private final GetUserUseCase getUserUseCase;
 
     @PostMapping("/register")
     @Operation(summary = "Inscription d'un nouvel utilisateur")
@@ -55,6 +59,13 @@ public class AuthController {
         LoginUseCase.LoginResult result = loginUseCase.login(
                 new LoginUseCase.LoginCommand(request.email(), request.password())
         );
+
+        // 2. Récupération de l'utilisateur pour l'événement
+        User user = getUserUseCase.getByEmail(request.email());
+
+        // 3. Publication de l'événement "UserLoggedIn"
+        userEventPublisherPort.publishUserLoggedIn(user);
+
 
         return ResponseEntity.ok(new AuthResponse(
                 result.token(),

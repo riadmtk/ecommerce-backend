@@ -14,10 +14,18 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: cart-service-group
+      auto-offset-reset: earliest
 
 server:
   port: 8084
 
+jwt:
+  secret: ${JWT_SECRET:devSecretKeyForLocalTestingOnly-256bits!}
+
 kafka:
   topics:
     cart-checked-out: cart.events
+    product-events: product.events
+    order-events: order.events

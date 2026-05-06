@@ -4,6 +4,7 @@ import com.ecommerce.product.domain.model.Product;
 import com.ecommerce.product.domain.exception.ResourceNotFoundException;
 import com.ecommerce.product.domain.port.in.*;
 import com.ecommerce.product.domain.port.out.ProductRepositoryPort;
+import com.ecommerce.product.domain.port.out.ProductEventPublisherPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.List;
 public class ProductService implements CreateProductUseCase, GetProductUseCase, GetAdminProductUseCase, GetAllProductsUseCase, UpdateProductUseCase, DeleteProductUseCase, HardDeleteProductUseCase, UpdateProductStockUseCase {
 
     private final ProductRepositoryPort productRepositoryPort;
+    private final ProductEventPublisherPort eventPublisherPort;
 
     // --- POST ---
     @Override
@@ -31,11 +33,18 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
                 .description(command.description())
                 .price(command.price())
                 .stockQuantity(command.stockQuantity())
+                .category(command.category())   // ajouté
+                .imageUrl(command.imageUrl())   // ajouté
                 .active(true)
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return productRepositoryPort.save(newProduct);
+        Product createdProduct = productRepositoryPort.save(newProduct);
+
+        // 🆕 Publication de l’événement "ProductCreated"
+        eventPublisherPort.publishProductCreated(createdProduct);
+
+        return createdProduct;
     }
 
     // --- PUT ---
@@ -52,8 +61,19 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
         existingProduct.setDescription(command.description());
         existingProduct.setPrice(command.price());
         existingProduct.setStockQuantity(command.stockQuantity());
+        existingProduct.setCategory(command.category());   // ← ajouté
+        existingProduct.setImageUrl(command.imageUrl());   // ← ajouté
 
-        return productRepositoryPort.save(existingProduct);
+        // 🟢 Log : valeurs après application des setters
+        System.out.println(">>> Category après set : " + existingProduct.getCategory());
+        System.out.println(">>> ImageUrl après set : " + existingProduct.getImageUrl());
+
+        Product updatedProduct = productRepositoryPort.save(existingProduct);
+
+        // 🆕 Publication de l’événement "ProductUpdated"
+        eventPublisherPort.publishProductUpdated(updatedProduct);
+
+        return updatedProduct;
     }
 
     // --- GET ADMIN (Interne) ---
@@ -80,8 +100,8 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
     // --- GET LIST ---
     @Override
     public List<Product> getAllProducts() {
-        return productRepositoryPort.findAll().stream()
-                .filter(Product::isActive) // Règle métier : masquer les produits supprimés !
+        return productRepositoryPort.findAllSortedByDate().stream()
+                .filter(Product::isActive) // toujours filtrer les inactifs
                 .toList();
     }
 
@@ -92,6 +112,7 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
         Product existingProduct = getProductById(id);
         existingProduct.setActive(false);
         productRepositoryPort.save(existingProduct);
+        eventPublisherPort.publishProductDeleted(id);
     }
 
     // --- HARD DELETE ---
@@ -101,6 +122,7 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
         getAdminProductById(id);
 
         productRepositoryPort.deleteById(id);
+        eventPublisherPort.publishProductDeleted(id);
     }
 
     @Override

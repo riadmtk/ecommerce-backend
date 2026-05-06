@@ -5,6 +5,7 @@ import com.ecommerce.user.domain.model.User;
 public interface JwtPort {
     String generateToken(User user);
     String extractEmail(String token);
+    String extractUserId(String token);
     boolean isTokenValid(String token, String email);
     long getExpirationInSeconds();
 }

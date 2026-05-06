@@ -1,0 +1,103 @@
+<div class="order-detail-container">
+
+  <!-- Bouton retour pour les admins -->
+  <button *ngIf="isAdmin$ | async" class="btn-back" routerLink="/admin/orders">
+    ← Retour à la gestion des commandes
+  </button>
+
+  <!-- Bouton retour pour les clients -->
+  <button *ngIf="!(isAdmin$ | async)" class="btn-back" routerLink="/orders">
+    ← Retour aux commandes
+  </button>
+  <div *ngIf="isLoading" class="loading">Chargement...</div>
+  <div *ngIf="errorMessage" class="error-banner">{{ errorMessage }}</div>
+
+  <div *ngIf="!isLoading && order" class="order-detail">
+
+    <!-- En-tête de la commande -->
+    <div class="order-header">
+      <div>
+        <h1>Commande #{{ order.id | slice:0:8 }}...</h1>
+        <p class="order-date">Passée le {{ order.createdAt | date:'dd/MM/yyyy à HH:mm' }}</p>
+        <p class="order-address" *ngIf="order.shippingAddress">
+          📍 {{ order.shippingAddress }}
+        </p>
+      </div>
+      <span class="order-status" [class]="getStatusClass(order.status)">
+        {{ getStatusLabel(order.status) }}
+      </span>
+    </div>
+
+    <!-- Actions utilisateur (client) -->
+    <div class="order-actions" *ngIf="!(isAdmin$ | async)">
+      <div class="client-actions">
+        <button *ngIf="order.status === 'PENDING'" class="btn-disabled" disabled title="Paiement en attente">
+          Confirmer la commande
+        </button>
+        <button *ngIf="canCancel(order.status)" (click)="cancelOrder()" class="btn-danger">
+          Annuler la commande
+        </button>
+        <button *ngIf="order.status === 'SHIPPED'" (click)="deliverOrder()" class="btn-success">
+          J'ai reçu ma commande
+        </button>
+      </div>
+    </div>
+
+    <!-- Actions administrateur -->
+    <div class="order-actions" *ngIf="isAdmin$ | async">
+      <div class="admin-actions">
+        <h3>🔧 Gestion de la commande</h3>
+        <div class="status-buttons">
+          <button *ngIf="order.status === 'PENDING'" class="btn-disabled" disabled title="En attente du paiement">
+            Confirmer la commande
+          </button>
+          <button *ngIf="order.status === 'PAID'" (click)="changeStatus('PROCESSING')" class="btn-primary">
+            En préparation
+          </button>
+          <button *ngIf="order.status === 'PROCESSING'" (click)="changeStatus('SHIPPED')" class="btn-primary">
+            Expédier
+          </button>
+          <button *ngIf="order.status === 'SHIPPED'" (click)="changeStatus('DELIVERED')" class="btn-primary">
+            Marquer comme livrée
+          </button>
+          <button *ngIf="order.status === 'DELIVERED'" (click)="changeStatus('REFUNDED')" class="btn-warning">
+            Rembourser
+          </button>
+          <button *ngIf="canCancel(order.status)" (click)="cancelOrder()" class="btn-danger">
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Articles commandés -->
+    <div class="order-items">
+      <h2>Articles commandés</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th>Quantité</th>
+            <th>Prix unitaire</th>
+            <th>Sous-total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of order.items">
+            <td>{{ item.productName }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.unitPrice | currencyMad }}</td>
+            <td>{{ item.quantity * item.unitPrice | currencyMad }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3"><strong>Total</strong></td>
+            <td><strong>{{ order.totalAmount | currencyMad }}</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+  </div>
+</div>

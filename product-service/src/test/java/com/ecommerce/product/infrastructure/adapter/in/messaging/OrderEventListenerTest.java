@@ -1,15 +1,18 @@
 package com.ecommerce.product.infrastructure.adapter.in.messaging;
 
 import com.ecommerce.product.domain.port.in.UpdateProductStockUseCase;
-import com.ecommerce.product.infrastructure.adapter.in.messaging.dto.OrderCreatedEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -18,43 +21,55 @@ class OrderEventListenerTest {
     @Mock
     private UpdateProductStockUseCase updateProductStockUseCase;
 
-    @InjectMocks
+    // On utilise un vrai ObjectMapper plutôt que de le mocker, c'est beaucoup plus simple pour tester le parsing JSON
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     private OrderEventListener orderEventListener;
+
+    @BeforeEach
+    void setUp() {
+        // On instancie le Listener avec le mock du UseCase et le vrai ObjectMapper
+        orderEventListener = new OrderEventListener(updateProductStockUseCase, objectMapper);
+    }
 
     @Test
     void shouldCallDecreaseStockWhenOrderCreatedEventReceived() {
-        // --- ARRANGE ---
+        // Arrange
         UUID productId = UUID.randomUUID();
-        UUID orderId = UUID.randomUUID();
-        int quantity = 3;
 
-        // On simule l'objet qui serait normalement désérialisé par Spring Kafka
-        OrderCreatedEvent event = new OrderCreatedEvent(orderId, productId, quantity);
+        // On simule exactement la structure JSON que le Order Service va envoyer
+        String jsonMessage = """
+                {
+                    "eventType": "OrderCreated",
+                    "orderId": "12345",
+                    "items": [
+                        {
+                            "productId": "%s",
+                            "quantity": 2
+                        }
+                    ]
+                }
+                """.formatted(productId.toString());
 
-        // --- ACT ---
-        // On appelle directement la méthode du listener
-        orderEventListener.handleOrderCreatedEvent(event);
+        // Act
+        orderEventListener.handleOrderCreatedEvent(jsonMessage);
 
-        // --- ASSERT ---
-        // On vérifie que le listener a bien transmis l'ordre au Domaine
-        verify(updateProductStockUseCase, times(1)).decreaseStock(productId, quantity);
+        // Assert
+        // On vérifie que le use case a bien été appelé avec l'ID du produit et la bonne quantité (2)
+        verify(updateProductStockUseCase, times(1)).decreaseStock(eq(productId), eq(2));
     }
 
     @Test
     void shouldHandleExceptionsGracefully() {
-        // --- ARRANGE ---
-        OrderCreatedEvent event = new OrderCreatedEvent(UUID.randomUUID(), UUID.randomUUID(), 1);
+        // Arrange
+        String invalidJsonMessage = "Ceci n'est pas un JSON valide";
 
-        // On simule une erreur dans le domaine (ex: produit introuvable ou stock insuffisant)
-        doThrow(new RuntimeException("Domain Error"))
-                .when(updateProductStockUseCase).decreaseStock(any(), anyInt());
+        // Act
+        // La méthode doit catcher l'exception en interne grâce au try-catch, le test ne doit donc pas crasher
+        orderEventListener.handleOrderCreatedEvent(invalidJsonMessage);
 
-        // --- ACT ---
-        // L'appel ne doit pas faire planter le thread Kafka (grâce au try-catch dans le listener)
-        orderEventListener.handleOrderCreatedEvent(event);
-
-        // --- ASSERT ---
-        // On vérifie simplement que l'appel a été tenté
-        verify(updateProductStockUseCase, times(1)).decreaseStock(any(), anyInt());
+        // Assert
+        // On vérifie que si le JSON est mauvais, le UseCase n'est jamais appelé
+        verify(updateProductStockUseCase, never()).decreaseStock(any(UUID.class), anyInt());
     }
 }

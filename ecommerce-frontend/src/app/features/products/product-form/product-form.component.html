@@ -1,0 +1,76 @@
+<div class="product-form-container">
+  <h1 class="form-title">{{ isEditMode ? 'Modifier le produit' : 'Ajouter un produit' }}</h1>
+
+  <div *ngIf="isLoading" class="loading">Chargement...</div>
+
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading" class="product-form">
+    <!-- Nom -->
+    <div class="form-group">
+      <label for="name">Nom du produit</label>
+      <input id="name" type="text" formControlName="name" placeholder="Entrez le nom de votre produit" />
+    </div>
+
+    <!-- Description -->
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" formControlName="description" rows="4" placeholder="Décrivez le produit..."></textarea>
+    </div>
+
+    <!-- Ligne prix / stock -->
+    <div class="form-row">
+      <div class="form-group">
+        <label for="price">Prix (MAD)</label>
+        <input id="price" type="number" step="0.01" formControlName="price" placeholder="0.00" />
+      </div>
+      <div class="form-group">
+        <label for="stockQuantity">Stock</label>
+        <input id="stockQuantity" type="number" step="1" formControlName="stockQuantity" placeholder="0" />
+      </div>
+    </div>
+
+    <!-- Catégorie -->
+     <!-- Catégorie (menu déroulant) -->
+    <div class="form-group">
+      <label for="category">Catégorie</label>
+      <select id="category" formControlName="category">
+        <option value="" disabled>Sélectionnez une catégorie</option>
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+    </div>
+
+    <!-- Upload image -->
+    <div class="form-group">
+      <label>Image du produit</label>
+      <div class="image-upload-area">
+        <!-- Aperçu de l'image actuelle ou de la nouvelle -->
+        <div class="image-preview" *ngIf="productForm.get('imageUrl')?.value">
+          <img [src]="productForm.get('imageUrl')?.value" alt="Aperçu" />
+        </div>
+        <div class="image-preview placeholder" *ngIf="!productForm.get('imageUrl')?.value">
+            🖼️ Aperçu de l'image
+        </div>
+
+        <!-- Zone de sélection du fichier -->
+        <div class="file-input-wrapper">
+          <input type="file" (change)="onFileSelected($event)" accept="image/*" id="fileInput" />
+          <label for="fileInput" class="file-input-label">
+            {{ selectedFileName ? selectedFileName : 'Choisir une image' }}
+          </label>
+        </div>
+        <p class="file-hint" *ngIf="!selectedFileName">Formats acceptés : JPG, PNG, GIF</p>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="success-banner" *ngIf="successMessage">{{ successMessage }}</div>
+    <div class="error-banner" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button type="submit" class="btn-primary" [disabled]="productForm.invalid || isSaving">
+        {{ isSaving ? 'Enregistrement...' : (isEditMode ? 'Mettre à jour' : 'Créer le produit') }}
+      </button>
+      <button type="button" class="btn-secondary" (click)="cancel()">Annuler</button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,28 @@
+<div class="orders-container">
+  <h1>Mes Commandes</h1>
+
+  <div *ngIf="isLoading" class="loading">Chargement...</div>
+  <div *ngIf="errorMessage" class="error-banner">{{ errorMessage }}</div>
+
+  <div *ngIf="!isLoading && orders.length === 0" class="empty-state">
+    <p>Aucune commande pour le moment.</p>
+    <a routerLink="/products">Parcourir le catalogue</a>
+  </div>
+
+  <div *ngIf="!isLoading && orders.length > 0" class="orders-list">
+    <div class="order-card" *ngFor="let order of orders">
+      <div class="order-header">
+        <span class="order-id">Commande #{{ order.id | slice:0:8 }}...</span>
+        <span class="order-status" [class]="getStatusClass(order.status)">
+          {{ getStatusLabel(order.status) }}
+        </span>
+      </div>
+      <div class="order-body">
+        <p>{{ order.items.length }} article(s)</p>
+        <p class="order-total">Total : {{ order.totalAmount | currencyMad }}</p>
+        <p class="order-date">{{ order.createdAt | date:'dd/MM/yyyy' }}</p>
+      </div>
+      <a [routerLink]="['/orders', order.id]" class="btn-detail">Voir le détail</a>
+    </div>
+  </div>
+</div>

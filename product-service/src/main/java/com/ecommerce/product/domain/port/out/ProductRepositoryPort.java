@@ -10,4 +10,5 @@ public interface ProductRepositoryPort {
     List<Product> findAll();
     Optional<Product> findById(UUID id);
     void deleteById(UUID id);
+    List<Product> findAllSortedByDate();  // nouvelle méthode
 }

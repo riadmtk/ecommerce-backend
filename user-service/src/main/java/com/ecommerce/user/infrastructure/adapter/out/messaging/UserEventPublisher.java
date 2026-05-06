@@ -8,9 +8,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -24,16 +27,39 @@ public class UserEventPublisher implements UserEventPublisherPort {
 
     @Override
     public void publishUserRegistered(User user) {
-        Map<String, Object> event = new HashMap<>();
+        Map<String, Object> event = new LinkedHashMap<>();
+        event.put("eventId", UUID.randomUUID().toString());
         event.put("eventType", "UserRegistered");
-        event.put("userId", user.getId().toString());
-        event.put("email", user.getEmail());
-        event.put("firstName", user.getFirstName());
-        event.put("lastName", user.getLastName());
-        event.put("occurredAt", LocalDateTime.now().toString());
+        event.put("timestamp", Instant.now().toString());
+        event.put("service", "user-service");
+        event.put("version", "1.0");
 
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("userId", user.getId().toString());
+        payload.put("email", user.getEmail());
+        payload.put("firstName", user.getFirstName());
+        payload.put("lastName", user.getLastName());
+
+        event.put("payload", payload);
         kafkaTemplate.send(userRegisteredTopic, user.getId().toString(), event);
+        log.info("UserRegistered event sent for userId: {}", user.getId());
+    }
 
-        log.info("Event UserRegistered publié pour userId: {}", user.getId());
+    @Override
+    public void publishUserLoggedIn(User user) {
+        Map<String, Object> event = new LinkedHashMap<>();
+        event.put("eventId", UUID.randomUUID().toString());
+        event.put("eventType", "UserLoggedIn");
+        event.put("timestamp", Instant.now().toString());
+        event.put("service", "user-service");
+        event.put("version", "1.0");
+
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("userId", user.getId().toString());
+        payload.put("email", user.getEmail());
+
+        event.put("payload", payload);
+        kafkaTemplate.send(userRegisteredTopic, user.getId().toString(), event);
+        log.info("UserLoggedIn event sent for userId: {}", user.getId());
     }
 }

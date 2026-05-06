@@ -1,0 +1,47 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>Connexion</h2>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="Votre adresse Email"
+          [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+        />
+        <span class="error-msg" *ngIf="loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched">
+          Format email invalide
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="Votre mot de passe"
+          [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+        />
+      </div>
+
+      <div class="error-banner" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" [disabled]="loginForm.invalid || isLoading">
+        {{ isLoading ? 'Connexion...' : 'Se connecter' }}
+      </button>
+
+      <p class="redirect">
+        Pas encore de compte ?
+        <a routerLink="/auth/register">S'inscrire</a>
+      </p>
+
+    </form>
+  </div>
+</div>

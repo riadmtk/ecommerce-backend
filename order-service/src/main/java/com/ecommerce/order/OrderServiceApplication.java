@@ -1,4 +1,4 @@
-package com.ecommerce.order_service;
+package com.ecommerce.order;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,6 +8,7 @@ public class OrderServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(OrderServiceApplication.class, args);
+        System.out.println("The service is running!");
 	}
 
 }

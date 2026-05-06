@@ -1,0 +1,20 @@
+<div class="checkout-container">
+  <h1>Passer la commande</h1>
+
+  <div class="checkout-form">
+    <div class="form-group">
+      <label for="address">Adresse de livraison</label>
+      <textarea id="address" [(ngModel)]="shippingAddress" rows="3"
+                placeholder="Rue, code postal, ville…"></textarea>
+    </div>
+
+    <div class="error-banner" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <div class="actions">
+      <button (click)="placeOrder()" [disabled]="isLoading" class="btn-primary">
+        {{ isLoading ? 'Création de la commande…' : 'Confirmer la commande' }}
+      </button>
+      <button routerLink="/cart" class="btn-secondary">Retour au panier</button>
+    </div>
+  </div>
+</div>
