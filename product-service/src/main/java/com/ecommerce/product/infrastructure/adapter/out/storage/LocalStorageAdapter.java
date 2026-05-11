@@ -1,7 +1,6 @@
 package com.ecommerce.product.infrastructure.adapter.out.storage;
 
 import com.ecommerce.product.domain.port.out.StoragePort;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,9 +12,6 @@ import java.util.UUID;
 
 @Component
 public class LocalStorageAdapter implements StoragePort {
-
-    @Value("${server.port:8082}")
-    private String serverPort;
 
     @Override
     public String store(MultipartFile file) {
@@ -52,7 +48,7 @@ public class LocalStorageAdapter implements StoragePort {
             throw new RuntimeException("Erreur lors de la sauvegarde du fichier", e);
         }
 
-        // 5. Retourner l'URL (absolue pour l'affichage)
-        return "http://localhost:" + serverPort + "/api/v1/products/images/" + newFilename;
+        // 5. Retourner UNIQUEMENT le nom du fichier ! (ex: b8b32b74-f441-4fd5-a1e4.webp)
+        return newFilename;
     }
 }

@@ -10,48 +10,26 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)   // ← Ajoutez cette ligne
+@EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
 
-    /*@Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
-    }*/
-
-    /*@Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers(HttpMethod.OPTIONS, "/**");
-    }*/
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                // 1. Explicitly DISABLE CORS here. The API Gateway handles it.
+                .cors(cors -> cors.disable())
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -59,13 +37,16 @@ public class SecurityConfig {
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 )
                 .authorizeHttpRequests(auth -> auth
+                        // Allow OPTIONS requests (Pre-flight checks) just in case they slip through the gateway
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // Public endpoints
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                        // Everything else requires the JWT token
                         .anyRequest().authenticated()
                 )
+                // 2. Validate the JWT token for all secure requests
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                //.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .build();
     }
 

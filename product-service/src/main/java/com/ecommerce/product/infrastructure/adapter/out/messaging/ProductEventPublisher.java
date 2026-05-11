@@ -2,16 +2,13 @@ package com.ecommerce.product.infrastructure.adapter.out.messaging;
 
 import com.ecommerce.product.domain.model.Product;
 import com.ecommerce.product.domain.port.out.ProductEventPublisherPort;
+import com.ecommerce.product.infrastructure.adapter.out.messaging.dto.ProductEventMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -26,58 +23,31 @@ public class ProductEventPublisher implements ProductEventPublisherPort {
 
     @Override
     public void publishProductDeleted(UUID productId) {
-        Map<String, Object> event = new LinkedHashMap<>();
-        event.put("eventId", UUID.randomUUID().toString());
-        event.put("eventType", "ProductDeleted");
-        event.put("timestamp", Instant.now().toString());
-        event.put("service", "product-service");
-        event.put("version", "1.0");
+        // For delete, we just need the ID and the event type
+        ProductEventMessage message = ProductEventMessage.builder()
+                .eventType("DELETED")
+                .id(productId)
+                .build();
 
-        Map<String, Object> payload = new LinkedHashMap<>();
-        payload.put("productId", productId.toString());
-
-        event.put("payload", payload);
-        kafkaTemplate.send(productEventsTopic, productId.toString(), event);
+        kafkaTemplate.send(productEventsTopic, productId.toString(), message);
         log.info("ProductDeleted event sent for product {}", productId);
     }
 
     @Override
     public void publishProductCreated(Product product) {
-        Map<String, Object> event = new LinkedHashMap<>();
-        event.put("eventId", UUID.randomUUID().toString());
-        event.put("eventType", "ProductCreated");
-        event.put("timestamp", Instant.now().toString());
-        event.put("service", "product-service");
-        event.put("version", "1.0");
+        // Use the helper method we built earlier!
+        ProductEventMessage message = ProductEventMessage.fromProduct("ProductCreated", product);
 
-        Map<String, Object> payload = new LinkedHashMap<>();
-        payload.put("productId", product.getId().toString());
-        payload.put("name", product.getName());
-        payload.put("price", product.getPrice());
-        payload.put("stockQuantity", product.getStockQuantity());
-
-        event.put("payload", payload);
-        kafkaTemplate.send(productEventsTopic, product.getId().toString(), event);
+        kafkaTemplate.send(productEventsTopic, product.getId().toString(), message);
         log.info("ProductCreated event sent for product {}", product.getId());
     }
 
     @Override
     public void publishProductUpdated(Product product) {
-        Map<String, Object> event = new LinkedHashMap<>();
-        event.put("eventId", UUID.randomUUID().toString());
-        event.put("eventType", "ProductUpdated");
-        event.put("timestamp", Instant.now().toString());
-        event.put("service", "product-service");
-        event.put("version", "1.0");
+        // Use the helper method we built earlier!
+        ProductEventMessage message = ProductEventMessage.fromProduct("ProductUpdated", product);
 
-        Map<String, Object> payload = new LinkedHashMap<>();
-        payload.put("productId", product.getId().toString());
-        payload.put("name", product.getName());
-        payload.put("price", product.getPrice());
-        payload.put("stockQuantity", product.getStockQuantity());
-
-        event.put("payload", payload);
-        kafkaTemplate.send(productEventsTopic, product.getId().toString(), event);
+        kafkaTemplate.send(productEventsTopic, product.getId().toString(), message);
         log.info("ProductUpdated event sent for product {}", product.getId());
     }
 }

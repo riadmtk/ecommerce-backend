@@ -8,6 +8,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -26,9 +28,6 @@ public class ProductEntity {
     @Column(name = "category")
     private String category;
 
-    @Column(name = "image_url")
-    private String imageUrl;
-
     @Column(length = 1000)
     private String description;
 
@@ -42,6 +41,11 @@ public class ProductEntity {
     @Column(name = "is_active")
     private boolean active = true;
 
+    // --- THE NEW ONE-TO-MANY RELATIONSHIP ---
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImageEntity> images = new ArrayList<>();
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -49,4 +53,16 @@ public class ProductEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    // --- CRITICAL HELPER METHODS FOR JPA ---
+    // Always use these methods to add/remove images so both sides of the relationship stay in sync
+    public void addImage(ProductImageEntity image) {
+        images.add(image);
+        image.setProduct(this);
+    }
+
+    public void removeImage(ProductImageEntity image) {
+        images.remove(image);
+        image.setProduct(null);
+    }
 }

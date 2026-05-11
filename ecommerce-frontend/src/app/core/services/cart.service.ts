@@ -9,7 +9,8 @@ import { Product } from '../models/product.model';
 @Injectable({ providedIn: 'root' })
 export class CartService {
 
-  private baseUrl = 'http://localhost:8084/api/v1/carts/my-cart';
+  // 1. FIXED: Now pulls dynamically from the Gateway URL in environment.ts!
+  private baseUrl = `${environment.services.cart}/my-cart`;
 
   constructor(private http: HttpClient) {}
 
@@ -37,16 +38,25 @@ export class CartService {
           return of({ cart, itemsDetailed: [] });
         }
         const productRequests = cart.items.map(item =>
+          // This one was already correct!
           this.http.get<Product>(`${environment.services.products}/${item.productId}`)
         );
         return forkJoin(productRequests).pipe(
           map(products => {
-            const itemsDetailed: CartItem[] = cart.items.map((item, index) => ({
-              ...item,
-              productName: products[index]?.name || 'Inconnu',
-              unitPrice: products[index]?.price || 0,
-              imageUrl: products[index]?.imageUrl
-            }));
+            const itemsDetailed: CartItem[] = cart.items.map((item, index) => {
+              
+              // --- CHANGED THIS SECTION ---
+              // Safely grab the primary image, or the first image, or undefined
+              const mainImage = products[index]?.images?.find(img => img.isPrimary) || products[index]?.images?.[0];
+              
+              return {
+                ...item,
+                productName: products[index]?.name || 'Inconnu',
+                unitPrice: products[index]?.price || 0,
+                // Pass the gateway URL + filename to the cart item
+                imageUrl: mainImage ? `${environment.apiGatewayUrl}/api/v1/products/images/${mainImage.imageUrl}` : undefined
+              };
+            });
             return { cart, itemsDetailed };
           })
         );
@@ -56,5 +66,5 @@ export class CartService {
 
   updateItemQuantity(productId: string, quantity: number): Observable<Cart> {
     return this.http.put<Cart>(`${this.baseUrl}/items/${productId}`, { quantity });
-}
+  }
 }

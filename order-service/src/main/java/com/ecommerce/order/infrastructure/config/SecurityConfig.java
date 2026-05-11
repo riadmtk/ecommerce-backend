@@ -8,19 +8,13 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import javax.crypto.spec.SecretKeySpec;
-import java.util.Collections;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -30,49 +24,40 @@ public class SecurityConfig {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-    /*// ---------- Configuration CORS explicite ----------
-    @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }*/
-
-    // ---------- Chaîne de filtres ----------
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                // 1. Explicitly DISABLE CORS (API Gateway handles it)
+                .cors(cors -> cors.disable())
+                // 2. Disable CSRF
                 .csrf(csrf -> csrf.disable())
+                // 3. Stateless sessions
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Pre-flight requests
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        // Swagger docs
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        // Secure everything else
                         .anyRequest().authenticated()
                 )
+                // 4. Resource Server for JWT validation
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 )
-                .cors(cors -> {})   // le filtre CorsFilter ci-dessus prend le relais
                 .build();
     }
 
-    // ---------- Converter JWT (identique à votre dernière version) ----------
+    // Standardized to match the product-service implementation
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter((Jwt jwt) -> {
-            String role = jwt.getClaim("role");
-            System.out.println(">>> JWT role: " + role);
-            if (role == null) return Collections.emptyList();
-            return List.of(new SimpleGrantedAuthority("ROLE_" + role));
-        });
-        return converter;
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("role");
+        grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
     }
 
     @Bean

@@ -19,7 +19,7 @@
 
   <div *ngIf="!isLoading && product" class="product-detail">
     <div class="product-image">
-      <img [src]="product.imageUrl || 'assets/placeholder.png'" [alt]="product.name" />
+      <img [src]="getProductImage(product)" [alt]="product.name" />
     </div>
     <div class="product-info">
       <h1>{{ product.name }}</h1>

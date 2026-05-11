@@ -1,6 +1,7 @@
 package com.ecommerce.search.domain.model;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 import lombok.*;
@@ -15,6 +16,8 @@ public class Product {
     private String description;
     private String category;
     private BigDecimal price;
+
+    private List<String> imageUrls;
 
     private int stockQuantity;
     private boolean active;

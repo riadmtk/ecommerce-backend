@@ -8,6 +8,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { CartService } from '../../../core/services/cart.service';
 import { CurrencyMadPipe } from '../../../shared/pipes/currency-mad.pipe';
 import { Observable, map } from 'rxjs';
+import { environment } from '../../../../environments/environment'; // ← ADDED IMPORT
 
 @Component({
   selector: 'app-product-detail',
@@ -130,5 +131,14 @@ export class ProductDetailComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  // --- NOUVELLE MÉTHODE D'AIDE POUR L'AFFICHAGE DES IMAGES ---
+  getProductImage(product: Product): string {
+    if (product.images && product.images.length > 0) {
+      const mainImage = product.images.find(img => img.isPrimary) || product.images[0];
+      return `${environment.apiGatewayUrl}/api/v1/products/images/${mainImage.imageUrl}`;
+    }
+    return 'assets/placeholder.png'; 
   }
 }

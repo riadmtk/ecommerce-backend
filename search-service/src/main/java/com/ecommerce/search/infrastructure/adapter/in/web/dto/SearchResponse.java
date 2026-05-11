@@ -23,6 +23,8 @@ public class SearchResponse {
         private String name;
         private String description;
         private BigDecimal price;
-        private boolean inStock; // Simplified boolean for the frontend UI
+        private boolean inStock;
+        private String category;
+        private List<String> imageUrls;
     }
 }

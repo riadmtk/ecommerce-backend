@@ -1,6 +1,7 @@
 package com.ecommerce.product.application.service;
 
 import com.ecommerce.product.domain.model.Product;
+import com.ecommerce.product.domain.model.ProductImage;
 import com.ecommerce.product.domain.exception.ResourceNotFoundException;
 import com.ecommerce.product.domain.port.in.*;
 import com.ecommerce.product.domain.port.out.ProductRepositoryPort;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.List;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +21,21 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
 
     private final ProductRepositoryPort productRepositoryPort;
     private final ProductEventPublisherPort eventPublisherPort;
+
+    // --- Helper Method to build Domain Images ---
+    private List<ProductImage> buildImages(List<String> imageUrls) {
+        List<ProductImage> productImages = new ArrayList<>();
+        if (imageUrls != null && !imageUrls.isEmpty()) {
+            for (int i = 0; i < imageUrls.size(); i++) {
+                productImages.add(ProductImage.builder()
+                        .imageUrl(imageUrls.get(i))
+                        .displayOrder(i)
+                        .isPrimary(i == 0)
+                        .build());
+            }
+        }
+        return productImages;
+    }
 
     // --- POST ---
     @Override
@@ -33,17 +50,14 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
                 .description(command.description())
                 .price(command.price())
                 .stockQuantity(command.stockQuantity())
-                .category(command.category())   // ajouté
-                .imageUrl(command.imageUrl())   // ajouté
+                .category(command.category())
+                .images(buildImages(command.imageUrls()))
                 .active(true)
                 .createdAt(LocalDateTime.now())
                 .build();
 
         Product createdProduct = productRepositoryPort.save(newProduct);
-
-        // 🆕 Publication de l’événement "ProductCreated"
         eventPublisherPort.publishProductCreated(createdProduct);
-
         return createdProduct;
     }
 
@@ -61,18 +75,11 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
         existingProduct.setDescription(command.description());
         existingProduct.setPrice(command.price());
         existingProduct.setStockQuantity(command.stockQuantity());
-        existingProduct.setCategory(command.category());   // ← ajouté
-        existingProduct.setImageUrl(command.imageUrl());   // ← ajouté
-
-        // 🟢 Log : valeurs après application des setters
-        System.out.println(">>> Category après set : " + existingProduct.getCategory());
-        System.out.println(">>> ImageUrl après set : " + existingProduct.getImageUrl());
+        existingProduct.setCategory(command.category());
+        existingProduct.setImages(buildImages(command.imageUrls()));
 
         Product updatedProduct = productRepositoryPort.save(existingProduct);
-
-        // 🆕 Publication de l’événement "ProductUpdated"
         eventPublisherPort.publishProductUpdated(updatedProduct);
-
         return updatedProduct;
     }
 

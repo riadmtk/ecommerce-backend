@@ -3,11 +3,11 @@ package com.ecommerce.search.infrastructure.adapter.in.messaging;
 import com.ecommerce.search.domain.model.Product;
 import com.ecommerce.search.domain.port.in.SyncProductUseCase;
 import com.ecommerce.search.infrastructure.adapter.in.messaging.dto.ProductEvent;
-import lombok.extern.slf4j.Slf4j; // <-- Add this
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-@Slf4j // <-- Add this
+@Slf4j
 @Component
 public class ProductEventConsumer {
 
@@ -20,8 +20,14 @@ public class ProductEventConsumer {
     @KafkaListener(topics = "product.events", groupId = "search-service-group")
     public void consume(ProductEvent event) {
 
-        // --- ADD THIS LOG LINE ---
         log.info("🔔 KAFKA MESSAGE RECEIVED IN SEARCH SERVICE: {}", event);
+
+        // --- 1. ADD THIS SAFEGUARD ---
+        // This prevents the infinite crash loop if Kafka sends a malformed message
+        if (event.getId() == null) {
+            log.error("❌ Received ProductEvent with null ID. Dropping message.");
+            return;
+        }
 
         if ("DELETED".equalsIgnoreCase(event.getEventType())) {
             syncUseCase.deleteProduct(event.getId().toString());
@@ -33,11 +39,12 @@ public class ProductEventConsumer {
                     .price(event.getPrice())
                     .stockQuantity(event.getStockQuantity())
                     .active(event.isActive())
+                    .category(event.getCategory())     // ← 2. Map the new category
+                    .imageUrls(event.getImageUrls())   // ← 3. Map the new image array
                     .build();
 
             syncUseCase.syncProduct(product);
 
-            // --- ADD THIS LOG LINE ---
             log.info("✅ PRODUCT SUCCESSFULLY SAVED TO ELASTICSEARCH: {}", product.getName());
         }
     }

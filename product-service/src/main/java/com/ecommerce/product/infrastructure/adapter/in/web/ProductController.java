@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -40,15 +41,20 @@ public class ProductController {
     private final HardDeleteProductUseCase hardDeleteProductUseCase;
     private final GetAdminProductUseCase getAdminProductUseCase;
     private final UpdateProductStockUseCase updateProductStockUseCase;
-    private final StoragePort storagePort;   // ← à injecter (via @RequiredArgsConstructor)
 
+    // Inject the StoragePort to handle physical file saving
+    private final StoragePort storagePort;
 
-    // --- UPLOAD IMAGE ---
-    @PostMapping("/upload-image")
-    @Operation(summary = "Upload an image")
-    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
-        String imageUrl = storagePort.store(file);
-        return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+    // --- UPLOAD IMAGES (Updated to handle multiple files at once) ---
+    @PostMapping(value = "/upload-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload one or multiple images")
+    public ResponseEntity<Map<String, List<String>>> uploadImages(@RequestParam("files") List<MultipartFile> files) {
+        // Loops through uploaded files, saves them, and collects the generated filenames
+        List<String> uploadedFilenames = files.stream()
+                .map(storagePort::store)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(Map.of("imageUrls", uploadedFilenames));
     }
 
     @GetMapping("/images/{filename}")
@@ -88,7 +94,7 @@ public class ProductController {
                 request.price(),
                 request.stockQuantity(),
                 request.category(),
-                request.imageUrl()
+                request.imageUrls() // ← Updated to pass the List of strings
         );
 
         Product createdProduct = createProductUseCase.execute(command);
@@ -113,7 +119,7 @@ public class ProductController {
 
     // --- GET ALL ---
     @GetMapping
-    @Operation(summary = "Get all products (Client)", description = "Retrieves a list of all active products. Returns 204 No Content if the catalog is completely empty.")
+    @Operation(summary = "Get all products (Client)", description = "Retrieves a list of all active products")
     public ResponseEntity<List<Product>> getAllProducts() {
         List<Product> products = getAllProductsUseCase.getAllProducts();
 
@@ -133,7 +139,7 @@ public class ProductController {
 
         // 🟢 Log : valeurs reçues du client
         System.out.println(">>> Category reçue : " + request.category());
-        System.out.println(">>> ImageUrl reçue : " + request.imageUrl());
+        System.out.println(">>> ImageUrls reçues : " + request.imageUrls());
 
         // Traduction : DTO Web + ID de l'URL -> Command Domaine
         UpdateProductCommand command = new UpdateProductCommand(
@@ -142,8 +148,8 @@ public class ProductController {
                 request.description(),
                 request.price(),
                 request.stockQuantity(),
-                request.category(),   // ajouté
-                request.imageUrl()    // ajouté
+                request.category(),
+                request.imageUrls()    // ← Updated to pass the List of strings
         );
 
         Product updatedProduct = updateProductUseCase.execute(command);
@@ -171,10 +177,10 @@ public class ProductController {
     @Operation(summary = "Decrease product stock", description = "Reduces the stock quantity of an active product")
     public ResponseEntity<Void> decreaseStock(
             @PathVariable UUID id,
-            @RequestParam int quantity) { // On passe la quantité dans l'URL (ex: ?quantity=2)
+            @RequestParam int quantity) {
 
         updateProductStockUseCase.decreaseStock(id, quantity);
-        return ResponseEntity.noContent().build(); // 204 No Content
+        return ResponseEntity.noContent().build();
     }
 
     // --- AUGMENTER LE STOCK ---

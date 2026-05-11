@@ -23,10 +23,8 @@ public class SearchController {
     @GetMapping("/products")
     public ResponseEntity<SearchResponse> search(SearchRequest request) {
 
-        // 1. Call the Domain use case
         List<Product> domainProducts = searchUseCase.searchProducts(request.getQuery());
 
-        // 2. Map Domain models to Web DTOs
         List<SearchResponse.ProductSummary> summaries = domainProducts.stream()
                 .map(product -> SearchResponse.ProductSummary.builder()
                         .id(product.getId())
@@ -34,13 +32,14 @@ public class SearchController {
                         .description(product.getDescription())
                         .price(product.getPrice())
                         .inStock(product.getStockQuantity() > 0)
+                        .category(product.getCategory())     // <-- Map category
+                        .imageUrls(product.getImageUrls())   // <-- Map image array
                         .build())
                 .collect(Collectors.toList());
 
-        // 3. Build and return the final response
         SearchResponse response = SearchResponse.builder()
                 .results(summaries)
-                .totalElements(summaries.size()) // Later, this will come from ES pagination
+                .totalElements(summaries.size())
                 .build();
 
         return ResponseEntity.ok(response);

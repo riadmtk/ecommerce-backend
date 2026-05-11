@@ -1,3 +1,11 @@
+// Add the new interface for the image objects sent by the backend
+export interface ProductImage {
+  id: string;
+  imageUrl: string;
+  displayOrder: number;
+  isPrimary: boolean;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -5,7 +13,7 @@ export interface Product {
   price: number;
   stockQuantity: number;
   category?: string;
-  imageUrl?: string;
+  images?: ProductImage[]; // ← CHANGED: Now expects the array of image objects
   createdAt: string;
 }
 
