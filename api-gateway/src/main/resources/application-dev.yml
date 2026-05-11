@@ -47,6 +47,13 @@ spring:
           filters:
             - RewritePath=/v3/api-docs/product, /v3/api-docs
 
+        - id: search-openapi
+          uri: http://localhost:8083
+          predicates:
+            - Path=/v3/api-docs/search
+          filters:
+            - RewritePath=/v3/api-docs/search, /v3/api-docs
+
         - id: cart-openapi
           uri: http://localhost:8084
           predicates:

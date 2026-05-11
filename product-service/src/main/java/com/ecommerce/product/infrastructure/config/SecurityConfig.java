@@ -27,7 +27,7 @@ public class SecurityConfig {
     // On récupère la clé secrète partagée avec le user-service (à mettre dans application.yml)
     @Value("${jwt.secret}")
     private String jwtSecret;
-
+    /*
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -39,7 +39,7 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
-    }
+    }*/
 
     /*@Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -68,8 +68,8 @@ public class SecurityConfig {
                 )
                 // On dit à Spring : "Tu es un Resource Server, attends-toi à recevoir un JWT"
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+                //.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
         return http.build();
     }
