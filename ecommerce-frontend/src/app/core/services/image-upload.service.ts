@@ -8,15 +8,20 @@ export class ImageUploadService {
   constructor(private http: HttpClient) {}
 
   /**
-   * Envoie un fichier image au backend et retourne l'URL de l'image uploadée.
-   * @param file Le fichier image à uploader
-   * @returns Un Observable contenant l'URL de l'image
+   * Envoie un ou plusieurs fichiers images au backend et retourne la liste des noms de fichiers générés.
+   * @param files Le tableau de fichiers images à uploader
+   * @returns Un Observable contenant le tableau des URLs/noms des images
    */
-  upload(file: File): Observable<{ imageUrl: string }> {
+  uploadImages(files: File[]): Observable<{ imageUrls: string[] }> {
     const formData = new FormData();
-    formData.append('file', file, file.name);
-    return this.http.post<{ imageUrl: string }>(
-      `${environment.services.products}/upload-image`,
+    
+    // Ajoute chaque fichier au FormData sous la clé 'files' attendue par le backend
+    files.forEach(file => {
+      formData.append('files', file, file.name);
+    });
+
+    return this.http.post<{ imageUrls: string[] }>(
+      `${environment.services.products}/upload-images`,
       formData
     );
   }

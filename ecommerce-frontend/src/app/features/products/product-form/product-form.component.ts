@@ -1,10 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef} from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ProductService } from '../../../core/services/product.service';
 import { ImageUploadService } from '../../../core/services/image-upload.service';
 import { Product } from '../../../core/models/product.model';
+import { environment } from '../../../../environments/environment'; // ← Import added for the preview URL
 
 @Component({
   selector: 'app-product-form',
@@ -21,9 +22,10 @@ export class ProductFormComponent implements OnInit {
   isSaving = false;
   errorMessage = '';
   successMessage = '';
-  selectedFileName = '';
+  
+  // Array of filenames for display
+  selectedFileNames: string[] = [];
 
-  // Liste des catégories disponibles
   categories: string[] = [
     'Sport',
     'Électronique',
@@ -51,7 +53,7 @@ export class ProductFormComponent implements OnInit {
       price: [0, [Validators.required, Validators.min(0.01)]],
       stockQuantity: [0, [Validators.required, Validators.min(0)]],
       category: [''],
-      imageUrl: ['']
+      imageUrls: [[]] // Array of image URLs
     });
   }
 
@@ -62,7 +64,18 @@ export class ProductFormComponent implements OnInit {
     if (this.isEditMode && this.productId) {
       this.productService.getById(this.productId).subscribe({
         next: (product) => {
-          this.productForm.patchValue(product);
+          // Extract string URLs from ProductImage objects
+          const extractedUrls = product.images ? product.images.map(img => img.imageUrl) : [];
+
+          this.productForm.patchValue({
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            stockQuantity: product.stockQuantity,
+            category: product.category,
+            imageUrls: extractedUrls 
+          });
+          
           this.isLoading = false;
           this.cdr.detectChanges();
         },
@@ -77,12 +90,19 @@ export class ProductFormComponent implements OnInit {
   }
 
   onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFileName = file.name;
-      this.imageUploadService.upload(file).subscribe({
-        next: (res) => this.productForm.patchValue({ imageUrl: res.imageUrl }),
-        error: () => this.errorMessage = 'Erreur lors du téléchargement de l\'image'
+    const files: FileList = event.target.files;
+    
+    if (files && files.length > 0) {
+      const fileArray = Array.from(files);
+      
+      // Update UI with all selected filenames
+      this.selectedFileNames = fileArray.map(f => f.name);
+      
+      this.imageUploadService.uploadImages(fileArray).subscribe({
+        next: (res) => {
+          this.productForm.patchValue({ imageUrls: res.imageUrls });
+        },
+        error: () => this.errorMessage = 'Erreur lors du téléchargement des images'
       });
     }
   }
@@ -101,7 +121,7 @@ export class ProductFormComponent implements OnInit {
 
     request$.subscribe({
       next: () => {
-        this.successMessage = this.isEditMode ? 'Produit mis à jour' : 'Produit créé';
+        this.successMessage = this.isEditMode ? 'Produit mis a jour' : 'Produit cree';
         this.isSaving = false;
         setTimeout(() => this.router.navigate(['/products', this.productId || '']), 1500);
       },
@@ -112,12 +132,20 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
-  // Redirection du bouton Annuler
   cancel(): void {
     if (this.isEditMode && this.productId) {
       this.router.navigate(['/products', this.productId]);
     } else {
       this.router.navigate(['/products']);
     }
+  }
+
+  // --- ADDED HELPER FOR IMAGE PREVIEW ---
+  getPreviewUrl(): string | null {
+    const urls = this.productForm.get('imageUrls')?.value;
+    if (urls && urls.length > 0) {
+      return `${environment.apiGatewayUrl}/api/v1/products/images/${urls[0]}`;
+    }
+    return null;
   }
 }

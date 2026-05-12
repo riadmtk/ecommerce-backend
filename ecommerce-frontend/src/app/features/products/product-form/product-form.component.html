@@ -4,19 +4,16 @@
   <div *ngIf="isLoading" class="loading">Chargement...</div>
 
   <form [formGroup]="productForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading" class="product-form">
-    <!-- Nom -->
     <div class="form-group">
       <label for="name">Nom du produit</label>
       <input id="name" type="text" formControlName="name" placeholder="Entrez le nom de votre produit" />
     </div>
 
-    <!-- Description -->
     <div class="form-group">
       <label for="description">Description</label>
       <textarea id="description" formControlName="description" rows="4" placeholder="Décrivez le produit..."></textarea>
     </div>
 
-    <!-- Ligne prix / stock -->
     <div class="form-row">
       <div class="form-group">
         <label for="price">Prix (MAD)</label>
@@ -28,8 +25,6 @@
       </div>
     </div>
 
-    <!-- Catégorie -->
-     <!-- Catégorie (menu déroulant) -->
     <div class="form-group">
       <label for="category">Catégorie</label>
       <select id="category" formControlName="category">
@@ -38,34 +33,37 @@
       </select>
     </div>
 
-    <!-- Upload image -->
     <div class="form-group">
-      <label>Image du produit</label>
+      <label>Images du produit</label>
       <div class="image-upload-area">
-        <!-- Aperçu de l'image actuelle ou de la nouvelle -->
-        <div class="image-preview" *ngIf="productForm.get('imageUrl')?.value">
-          <img [src]="productForm.get('imageUrl')?.value" alt="Aperçu" />
+        
+        <div class="image-preview" *ngIf="getPreviewUrl()">
+          <img [src]="getPreviewUrl()" alt="Aperçu" style="max-width: 100%; height: auto; border-radius: 8px;" />
         </div>
-        <div class="image-preview placeholder" *ngIf="!productForm.get('imageUrl')?.value">
+        <div class="image-preview placeholder" *ngIf="!getPreviewUrl()">
             🖼️ Aperçu de l'image
         </div>
 
-        <!-- Zone de sélection du fichier -->
         <div class="file-input-wrapper">
-          <input type="file" (change)="onFileSelected($event)" accept="image/*" id="fileInput" />
+          <input type="file" (change)="onFileSelected($event)" accept="image/*" id="fileInput" multiple />
           <label for="fileInput" class="file-input-label">
-            {{ selectedFileName ? selectedFileName : 'Choisir une image' }}
+            
+            <span *ngIf="selectedFileNames && selectedFileNames.length > 0">
+              {{ selectedFileNames.length }} fichier(s) sélectionné(s)
+            </span>
+            <span *ngIf="!selectedFileNames || selectedFileNames.length === 0">
+              Choisir des images
+            </span>
+            
           </label>
         </div>
-        <p class="file-hint" *ngIf="!selectedFileName">Formats acceptés : JPG, PNG, GIF</p>
+        <p class="file-hint" *ngIf="!selectedFileNames || selectedFileNames.length === 0">Formats acceptés : JPG, PNG, GIF</p>
       </div>
     </div>
 
-    <!-- Messages -->
     <div class="success-banner" *ngIf="successMessage">{{ successMessage }}</div>
     <div class="error-banner" *ngIf="errorMessage">{{ errorMessage }}</div>
 
-    <!-- Actions -->
     <div class="form-actions">
       <button type="submit" class="btn-primary" [disabled]="productForm.invalid || isSaving">
         {{ isSaving ? 'Enregistrement...' : (isEditMode ? 'Mettre à jour' : 'Créer le produit') }}
