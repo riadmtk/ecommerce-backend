@@ -4,12 +4,16 @@ import { RouterModule } from '@angular/router';
 import { ProductService } from '../../../core/services/product.service';
 import { Product } from '../../../core/models/product.model';
 import { CurrencyMadPipe } from '../../../shared/pipes/currency-mad.pipe';
-import { environment } from '../../../../environments/environment'; 
+import { environment } from '../../../../environments/environment';
+
+// ← 1. IMPORT YOUR SHARED SEARCH BAR
+import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component'; 
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, CurrencyMadPipe],
+  // ← 2. ADD IT TO THE IMPORTS ARRAY
+  imports: [CommonModule, RouterModule, CurrencyMadPipe, SearchBarComponent], 
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss']
 })
@@ -25,11 +29,16 @@ export class ProductListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadAllProducts();
+  }
+
+  loadAllProducts(): void {
+    this.isLoading = true;
     this.productService.getAll().subscribe({
       next: (products) => {
         this.products = products;
         this.isLoading = false;
-        this.cdr.detectChanges(); // ← force Angular à vérifier les changements
+        this.cdr.detectChanges(); 
       },
       error: () => {
         this.errorMessage = 'Erreur lors du chargement des produits';
@@ -38,19 +47,16 @@ export class ProductListComponent implements OnInit {
     });
   }
 
-  // --- UPDATED HELPER METHOD ---
   getProductImage(product: Product): string {
-    // 1. Check if the 'images' array exists and has at least one object
     if (product.images && product.images.length > 0) {
-      
-      // 2. Find the image marked as primary, or fallback to the first one in the list
       const mainImage = product.images.find(img => img.isPrimary) || product.images[0];
-      
-      // 3. Return the Gateway URL + the extracted filename from the object
       return `${environment.apiGatewayUrl}/api/v1/products/images/${mainImage.imageUrl}`;
     }
     
-    // Fallback if no images exist
+    if (product.imageUrls && product.imageUrls.length > 0) {
+      return `${environment.apiGatewayUrl}/api/v1/products/images/${product.imageUrls[0]}`;
+    }
+
     return 'assets/placeholder.png'; 
   }
 }

@@ -23,6 +23,7 @@ public class SearchResponse {
         private String name;
         private String description;
         private BigDecimal price;
+        private int stockQuantity;
         private boolean inStock;
         private String category;
         private List<String> imageUrls;

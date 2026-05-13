@@ -1,25 +1,25 @@
-<div class="product-list-container">
+<div class="search-page-container">
+  
   
   <div class="header-section">
-    <h1>Catalogue Produits</h1>
+    <h1>Résultats pour "{{ currentQuery }}"</h1>
     
     <div class="search-container">
        <app-search-bar></app-search-bar>
     </div>
   </div>
 
-  <div *ngIf="isLoading" class="loading">Chargement...</div>
+  <div *ngIf="isLoading" class="loading">Recherche en cours...</div>
   <div *ngIf="errorMessage" class="error-banner">{{ errorMessage }}</div>
 
   <div *ngIf="!isLoading && products.length === 0 && !errorMessage" class="no-results">
-    Aucun produit disponible pour le moment.
+    Oups ! Aucun produit trouvé pour "{{ currentQuery }}". 
+    <br><a routerLink="/products">Retour au catalogue</a>
   </div>
 
   <div *ngIf="!isLoading && !errorMessage && products.length > 0" class="products-grid">
     <div class="product-card" *ngFor="let product of products">
-      
       <img [src]="getProductImage(product)" [alt]="product.name" />
-      
       <div class="product-info">
         <h3>{{ product.name }}</h3>
         <p class="category" *ngIf="product.category">{{ product.category }}</p>

@@ -31,6 +31,7 @@ public class SearchController {
                         .name(product.getName())
                         .description(product.getDescription())
                         .price(product.getPrice())
+                        .stockQuantity(product.getStockQuantity())
                         .inStock(product.getStockQuantity() > 0)
                         .category(product.getCategory())     // <-- Map category
                         .imageUrls(product.getImageUrls())   // <-- Map image array

@@ -47,12 +47,17 @@ export const routes: Routes = [
   },
 
   {
+    path: 'search',
+    loadComponent: () =>
+      import('./features/search/search-results/search-results.component').then(m => m.SearchResultsComponent)
+  },
+
+  {
     path: 'cart',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/cart/cart.component').then(m => m.CartComponent)
   },
-
 
   {
     path: 'orders',
@@ -78,7 +83,6 @@ export const routes: Routes = [
       import('./features/orders/checkout/checkout.component').then(m => m.CheckoutComponent)
   },
 
-
   {
     path: 'profile',
     canActivate: [authGuard],
@@ -92,7 +96,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/admin/orders/admin-orders.component').then(m => m.AdminOrdersComponent)
   },
-
 
   // Pages légales
   {
@@ -120,8 +123,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/legal/legal-cookies.component').then(m => m.LegalCookiesComponent)
   },
-
-
 
   { path: '**', redirectTo: '/products' }
 ];

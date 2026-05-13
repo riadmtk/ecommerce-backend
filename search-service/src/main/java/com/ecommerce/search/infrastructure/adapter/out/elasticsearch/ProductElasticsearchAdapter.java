@@ -7,7 +7,6 @@ import com.ecommerce.search.infrastructure.adapter.out.elasticsearch.repository.
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -25,16 +24,15 @@ public class ProductElasticsearchAdapter implements ProductSearchPort {
             throw new IllegalArgumentException("Cannot index a product with a null ID");
         }
 
-        // Map Pure Domain -> Infrastructure Document
         ProductDocument doc = ProductDocument.builder()
-                .id(product.getId()) // ID is now UUID
+                .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .stockQuantity(product.getStockQuantity())
                 .active(product.isActive())
-                .category(product.getCategory())     // ← Map the new category field
-                .imageUrls(product.getImageUrls())   // ← Map the new array of images
+                .category(product.getCategory())
+                .imageUrls(product.getImageUrls())
                 .build();
 
         repository.save(doc);
@@ -42,24 +40,24 @@ public class ProductElasticsearchAdapter implements ProductSearchPort {
 
     @Override
     public void removeProduct(String productId) {
-        // Convert the String ID back to UUID before deleting from Elasticsearch
         repository.deleteById(productId);
     }
 
     @Override
     public List<Product> searchByName(String query) {
-        // Fetch from ES and Map Infrastructure Document -> Pure Domain
-        return repository.findByNameContainingIgnoreCaseAndActiveTrueAndStockQuantityGreaterThan(query, 0)
+
+        // 🚀 Call the new Multi-Match query!
+        return repository.searchProductsWithMultiMatch(query)
                 .stream()
                 .map(doc -> Product.builder()
-                        .id(doc.getId()) // ID is now UUID
+                        .id(doc.getId())
                         .name(doc.getName())
                         .description(doc.getDescription())
                         .price(doc.getPrice())
                         .stockQuantity(doc.getStockQuantity())
                         .active(doc.isActive())
-                        .category(doc.getCategory())     // ← Map the new category field
-                        .imageUrls(doc.getImageUrls())   // ← Map the new array of images
+                        .category(doc.getCategory())
+                        .imageUrls(doc.getImageUrls())
                         .build())
                 .collect(Collectors.toList());
     }

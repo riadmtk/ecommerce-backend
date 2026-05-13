@@ -13,7 +13,8 @@ export interface Product {
   price: number;
   stockQuantity: number;
   category?: string;
-  images?: ProductImage[]; // ← CHANGED: Now expects the array of image objects
+  images?: ProductImage[];
+  imageUrls?: string[];
   createdAt: string;
 }
 
