@@ -62,6 +62,15 @@ public class OrderEventPublisherAdapter implements OrderEventPublisherPort {
         payload.put("orderId", order.getId().toString());
         payload.put("userId", order.getUserId().toString());
 
+        // ➕ Ajouter les articles pour la mise à jour du stock
+        List<Map<String, Object>> items = order.getItems().stream().map(item -> {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("productId", item.getProductId().toString());
+            map.put("quantity", item.getQuantity());
+            return map;
+        }).collect(Collectors.toList());
+        payload.put("items", items);
+
         event.put("payload", payload);
         kafkaTemplate.send(orderEventsTopic, order.getId().toString(), event);
         log.info("OrderCancelled event sent for order {}", order.getId());

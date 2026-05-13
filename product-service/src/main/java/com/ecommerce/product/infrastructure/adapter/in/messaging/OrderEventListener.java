@@ -34,6 +34,15 @@ public class OrderEventListener {
                     int quantity = (Integer) item.get("quantity");
                     updateProductStockUseCase.decreaseStock(productId, quantity);
                 }
+            } else if ("OrderCancelled".equals(eventType)) {
+                // augmenter le stock (annulation)
+                Map<String, Object> payload = (Map<String, Object>) event.get("payload");
+                List<Map<String, Object>> items = (List<Map<String, Object>>) payload.get("items");
+                for (Map<String, Object> item : items) {
+                    UUID productId = UUID.fromString((String) item.get("productId"));
+                    int quantity = (Integer) item.get("quantity");
+                    updateProductStockUseCase.increaseStock(productId, quantity);
+                }
             } else if ("OrderRefunded".equals(eventType)) {
                 // augmenter le stock
                 Map<String, Object> payload = (Map<String, Object>) event.get("payload");
