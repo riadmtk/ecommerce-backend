@@ -6,4 +6,5 @@ public interface OrderEventPublisherPort {
     void publishOrderCreated(Order order);
     void publishOrderCancelled(Order order);
     void publishOrderRefunded(Order order);
+    void publishOrderStatusUpdated(Order order, String previousStatus);   // ← ajoutez cette ligne
 }

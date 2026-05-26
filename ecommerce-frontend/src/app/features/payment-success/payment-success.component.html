@@ -1,0 +1,17 @@
+<div class="success-container">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <h1>Paiement réussi !</h1>
+    <p>Votre paiement a été traité avec succès.</p>
+    <p *ngIf="orderId" class="order-ref">
+      Référence commande : <strong>#{{ orderId | slice:0:8 }}...</strong>
+    </p>
+    <p class="redirect-msg">Redirection automatique dans 5 secondes...</p>
+    <a *ngIf="orderId" [routerLink]="['/orders', orderId]" class="btn-view">
+      Voir ma commande
+    </a>
+    <a *ngIf="!orderId" routerLink="/orders" class="btn-view">
+      Voir mes commandes
+    </a>
+  </div>
+</div>

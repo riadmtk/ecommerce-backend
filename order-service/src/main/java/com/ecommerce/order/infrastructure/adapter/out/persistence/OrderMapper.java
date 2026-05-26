@@ -44,9 +44,14 @@ public class OrderMapper {
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
                 .build();
-        entity.setItems(order.getItems().stream()
-                .map(item -> toEntityItem(item, entity))
-                .collect(Collectors.toList()));
+        if (order.getItems() != null) {
+            // Vider la collection existante pour éviter les orphelins
+            entity.getItems().clear();
+            // Ajouter chaque item en passant l'entité parent pour la relation bidirectionnelle
+            order.getItems().forEach(item ->
+                    entity.getItems().add(toEntityItem(item, entity))
+            );
+        }
         return entity;
     }
 

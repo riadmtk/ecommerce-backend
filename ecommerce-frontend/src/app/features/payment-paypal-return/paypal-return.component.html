@@ -1,0 +1,33 @@
+<div class="paypal-return-container">
+
+  <!-- Chargement -->
+  <div *ngIf="status === 'loading'" class="state-card loading">
+    <div class="spinner"></div>
+    <h2>Confirmation en cours...</h2>
+    <p>Veuillez patienter, nous confirmons votre paiement PayPal.</p>
+  </div>
+
+  <!-- Succès -->
+  <div *ngIf="status === 'success'" class="state-card success">
+    <div class="icon">✅</div>
+    <h2>Paiement confirmé !</h2>
+    <p>Votre paiement PayPal a été validé avec succès.</p>
+    <p class="redirect-msg">Redirection en cours...</p>
+  </div>
+
+  <!-- Erreur -->
+  <div *ngIf="status === 'error'" class="state-card error">
+    <div class="icon">❌</div>
+    <h2>Erreur de confirmation</h2>
+    <p>{{ errorMessage }}</p>
+    <div class="actions">
+      <a *ngIf="orderId" [routerLink]="['/orders', orderId]" class="btn-primary">
+        Voir ma commande
+      </a>
+      <a routerLink="/orders" class="btn-secondary">
+        Mes commandes
+      </a>
+    </div>
+  </div>
+
+</div>
