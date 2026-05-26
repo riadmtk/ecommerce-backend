@@ -1,16 +1,38 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${PAYMENT_DB_HOST:localhost}:${PAYMENT_DB_PORT:5432}/${PAYMENT_DB_NAME:ecommerce_payments}
+    url: jdbc:postgresql://${PAYMENT_DB_HOST:localhost}:${PAYMENT_DB_PORT:5437}/${PAYMENT_DB_NAME:ecommerce_payments}
     username: ${PAYMENT_DB_USERNAME:postgres}
-    password: ${PAYMENT_DB_PASSWORD:postgres}
+    password: ${PAYMENT_DB_PASSWORD:postgres123}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: false
   kafka:
     bootstrap-servers: localhost:9092
+
+stripe:
+  api-key: ${STRIPE_API_KEY}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+
+paypal:
+  client-id: CHANGE_ME_AVEC_VRAI_CLIENT_ID_SANDBOX
+  client-secret: CHANGE_ME_AVEC_VRAI_CLIENT_SECRET_SANDBOX
+  mode: sandbox
 
 logging:
   level:
     com.ecommerce.payment: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.kafka: DEBUG
+
+external:
+  kafka:
+    enabled: false   # ← passer à true pour activer l'envoi externe
+    bootstrap-servers: 136.115.254.39:9092
+    topic: ecommerce-events

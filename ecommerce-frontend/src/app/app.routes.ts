@@ -97,6 +97,35 @@ export const routes: Routes = [
       import('./features/admin/orders/admin-orders.component').then(m => m.AdminOrdersComponent)
   },
 
+  {
+    path: 'payment-checkout',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/checkout/checkout.component').then(m => m.CheckoutComponent)
+  },
+  {
+    path: 'payment-success',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/payment-success/payment-success.component')
+        .then(m => m.PaymentSuccessComponent)
+  },
+
+  {
+    path: 'payment/paypal/success',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/payment-paypal-return/paypal-return.component')
+        .then(m => m.PaypalReturnComponent)
+  },
+  {
+    path: 'payment/paypal/cancel',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/payment-paypal-cancel/paypal-cancel.component')
+        .then(m => m.PaypalCancelComponent)
+  },
+
   // Pages légales
   {
     path: 'mentions-legales',

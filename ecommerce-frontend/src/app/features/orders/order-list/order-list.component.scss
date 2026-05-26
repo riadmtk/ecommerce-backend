@@ -48,9 +48,13 @@
         font-weight: 600;
 
         &.status-pending   { background: #fef3c7; color: #d97706; }
+        &.status-paid      { background: #dbeafe; color: #1e40af; }
         &.status-confirmed { background: #dbeafe; color: #1d4ed8; }
+        &.status-processing { background: #e0e7ff; color: #3730a3; }
         &.status-shipped   { background: #e0e7ff; color: #4f46e5; }
         &.status-delivered { background: #dcfce7; color: #16a34a; }
+        &.status-cancelled { background: #fee2e2; color: #991b1b; }
+        &.status-refund-requested { background: #fef3c7; color: #b45309; }
         &.status-refunded  { background: #fee2e2; color: #dc2626; }
       }
     }
@@ -76,6 +80,26 @@
       transition: background 0.2s;
 
       &:hover { background: #e5e7eb; }
+    }
+  }
+
+  .order-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    .btn-pay-now {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #4f46e5;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.2s;
+
+      &:hover { background: #4338ca; }
     }
   }
 }

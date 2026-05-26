@@ -36,4 +36,16 @@ export class OrderService {
   cancelOrder(orderId: string): Observable<Order> {
     return this.http.post<Order>(`${environment.services.orders}/${orderId}/cancel`, {});
   }
+
+  requestRefund(orderId: string): Observable<Order> {
+    return this.http.post<Order>(`${environment.services.orders}/${orderId}/request-refund`, {});
+  }
+  
+  approveRefund(orderId: string): Observable<Order> {
+      return this.http.post<Order>(`${environment.services.orders}/${orderId}/approve-refund`, {});
+  }
+
+  rejectRefund(orderId: string): Observable<Order> {
+      return this.http.post<Order>(`${environment.services.orders}/${orderId}/reject-refund`, {});
+  }
 }

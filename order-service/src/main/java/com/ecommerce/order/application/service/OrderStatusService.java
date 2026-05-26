@@ -7,6 +7,7 @@ import com.ecommerce.order.domain.port.in.UpdateOrderStatusUseCase;
 import com.ecommerce.order.domain.port.out.OrderEventPublisherPort;
 import com.ecommerce.order.domain.port.out.OrderRepositoryPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,18 +19,26 @@ public class OrderStatusService implements UpdateOrderStatusUseCase {
 
     private final OrderRepositoryPort orderRepository;
     private final OrderEventPublisherPort eventPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;   // ← nouveau
+
 
     @Override
     public Order updateStatus(UUID orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
+
         Order updatedOrder = order.updateStatus(newStatus);
         updatedOrder = orderRepository.save(updatedOrder);
 
+        // Événement interne (Kafka local)
+        eventPublisher.publishOrderStatusUpdated(updatedOrder, order.getStatus().name());
+        // Événement Spring pour les listeners externes
+        applicationEventPublisher.publishEvent(updatedOrder);
+
         // Publier un événement si le nouveau statut est REFUNDED
-        if (newStatus == OrderStatus.REFUNDED) {
+        /*if (newStatus == OrderStatus.REFUNDED) {
             eventPublisher.publishOrderRefunded(updatedOrder);
-        }
+        }*/
         return updatedOrder;
     }
 }

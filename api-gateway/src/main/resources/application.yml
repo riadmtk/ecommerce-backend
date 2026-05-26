@@ -63,3 +63,5 @@ springdoc:
         url: /v3/api-docs/order
       - name: 🧾 Search Service
         url: /v3/api-docs/search
+      - name: 💳 Payment Service
+        url: /v3/api-docs/payment

@@ -9,6 +9,7 @@
   <button *ngIf="!(isAdmin$ | async)" class="btn-back" routerLink="/orders">
     ← Retour aux commandes
   </button>
+
   <div *ngIf="isLoading" class="loading">Chargement...</div>
   <div *ngIf="errorMessage" class="error-banner">{{ errorMessage }}</div>
 
@@ -31,9 +32,6 @@
     <!-- Actions utilisateur (client) -->
     <div class="order-actions" *ngIf="!(isAdmin$ | async)">
       <div class="client-actions">
-        <button *ngIf="order.status === 'PENDING'" class="btn-disabled" disabled title="Paiement en attente">
-          Confirmer la commande
-        </button>
         <button *ngIf="canCancel(order.status)" (click)="cancelOrder()" class="btn-danger">
           Annuler la commande
         </button>
@@ -48,9 +46,7 @@
       <div class="admin-actions">
         <h3>🔧 Gestion de la commande</h3>
         <div class="status-buttons">
-          <button *ngIf="order.status === 'PENDING'" class="btn-disabled" disabled title="En attente du paiement">
-            Confirmer la commande
-          </button>
+          
           <button *ngIf="order.status === 'PAID'" (click)="changeStatus('PROCESSING')" class="btn-primary">
             En préparation
           </button>
@@ -60,9 +56,9 @@
           <button *ngIf="order.status === 'SHIPPED'" (click)="changeStatus('DELIVERED')" class="btn-primary">
             Marquer comme livrée
           </button>
-          <button *ngIf="order.status === 'DELIVERED'" (click)="changeStatus('REFUNDED')" class="btn-warning">
+          <!--<button *ngIf="order.status === 'DELIVERED'" (click)="changeStatus('REFUNDED')" class="btn-warning">
             Rembourser
-          </button>
+          </button>-->
           <button *ngIf="canCancel(order.status)" (click)="cancelOrder()" class="btn-danger">
             Annuler
           </button>
@@ -98,6 +94,89 @@
         </tfoot>
       </table>
     </div>
+
+    <!-- =================== SECTION PAIEMENT =================== -->
+    <div class="section payment-section">
+      <h2>💳 Paiement</h2>
+
+      <!-- Pas encore de paiement ou paiement échoué -->
+      <div *ngIf="!payment || payment.status === 'FAILED'" class="no-payment">
+        <p *ngIf="!payment">Aucun paiement initié pour cette commande.</p>
+        <p *ngIf="payment?.status === 'FAILED'" class="failed-msg">
+          ❌ Le dernier paiement a échoué :
+          <em>{{ payment?.failureReason }}</em>
+        </p>
+        <a *ngIf="canPay()" [routerLink]="['/payment-checkout']" [queryParams]="{ orderId: order.id }"
+          class="btn-pay-link">
+          💳 Payer maintenant
+        </a>
+      </div>
+
+      <!-- Paiement existant (PENDING, SUCCESS ou REFUNDED) -->
+      <div *ngIf="payment && payment.status !== 'FAILED'" class="payment-info">
+
+        <div class="payment-grid">
+
+          <div class="info-item">
+            <span class="info-label">Statut</span>
+            <span class="payment-status" [class]="getPaymentStatusClass(payment.status)">
+              {{ getPaymentStatusLabel(payment.status) }}
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Méthode</span>
+            <span class="info-value">
+              {{ payment.paymentMethod === 'STRIPE' ? '💳 Carte bancaire' : '🅿️ PayPal' }}
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Montant</span>
+            <span class="info-value amount">{{ payment.amount | currencyMad }}</span>
+          </div>
+
+          <div class="info-item" *ngIf="payment.transactionId">
+            <span class="info-label">Transaction ID</span>
+            <span class="info-value transaction-id">{{ payment.transactionId }}</span>
+          </div>
+
+          <div class="info-item" *ngIf="payment.failureReason">
+            <span class="info-label">Raison d'échec</span>
+            <span class="info-value error-text">{{ payment.failureReason }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Date</span>
+            <span class="info-value">
+              {{ payment.createdAt | date:'dd/MM/yyyy HH:mm' }}
+            </span>
+          </div>
+
+        </div>
+
+        <!-- Actions paiement -->
+        <div class="payment-actions">
+          <!-- Pour le client -->
+          <button *ngIf="order.status === 'DELIVERED' && !(isAdmin$ | async)" (click)="requestRefund()"
+            class="btn-warning">
+            Demander un remboursement
+          </button>
+
+          <!-- Pour l'admin -->
+          <ng-container *ngIf="order.status === 'REFUND_REQUESTED' && (isAdmin$ | async)">
+            <button (click)="approveRefund()" class="btn-success">Approuver le remboursement</button>
+            <button (click)="rejectRefund()" class="btn-danger">Rejeter</button>
+          </ng-container>
+
+          <div *ngIf="refundSuccess" class="success-banner">
+            ✅ Remboursement effectué avec succès
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- =================== FIN SECTION PAIEMENT =================== -->
 
   </div>
 </div>

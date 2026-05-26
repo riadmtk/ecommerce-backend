@@ -101,4 +101,23 @@ public class OrderEventPublisherAdapter implements OrderEventPublisherPort {
         kafkaTemplate.send(orderEventsTopic, order.getId().toString(), event);
         log.info("OrderRefunded event sent for order {}", order.getId());
     }
+
+    @Override
+    public void publishOrderStatusUpdated(Order order, String previousStatus) {
+        Map<String, Object> event = new LinkedHashMap<>();
+        event.put("eventId", UUID.randomUUID().toString());
+        event.put("eventType", "OrderStatusUpdated");
+        event.put("timestamp", Instant.now().toString());
+        event.put("service", "order-service");
+        event.put("version", "1.0");
+
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("orderId", order.getId().toString());
+        payload.put("previousStatus", previousStatus);
+        payload.put("newStatus", order.getStatus().name());
+
+        event.put("payload", payload);
+        kafkaTemplate.send(orderEventsTopic, order.getId().toString(), event);
+        log.info("OrderStatusUpdated event sent for order {}", order.getId());
+    }
 }

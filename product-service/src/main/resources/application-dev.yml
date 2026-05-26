@@ -29,3 +29,9 @@ logging:
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+external:
+  kafka:
+    enabled: false   # true pour tester l'envoi vers GCP
+    bootstrap-servers: 136.115.254.39:9092
+    topic: ecommerce-events

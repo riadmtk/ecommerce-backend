@@ -44,9 +44,13 @@ export class OrderListComponent implements OnInit {
   getStatusLabel(status: string): string {
     const labels: Record<string, string> = {
       PENDING: 'En attente',
+      PAID: 'Payée',
       CONFIRMED: 'Confirmée',
+      PROCESSING: 'En préparation',
       SHIPPED: 'Expédiée',
       DELIVERED: 'Livrée',
+      CANCELLED: 'Annulée',
+      REFUND_REQUESTED: 'Remboursement demandé',
       REFUNDED: 'Remboursée'
     };
     return labels[status] || status;
@@ -55,9 +59,13 @@ export class OrderListComponent implements OnInit {
   getStatusClass(status: string): string {
     const classes: Record<string, string> = {
       PENDING: 'status-pending',
+      PAID: 'status-paid',
       CONFIRMED: 'status-confirmed',
+      PROCESSING: 'status-processing',
       SHIPPED: 'status-shipped',
       DELIVERED: 'status-delivered',
+      CANCELLED: 'status-cancelled',
+      REFUND_REQUESTED: 'status-refund-requested',
       REFUNDED: 'status-refunded'
     };
     return classes[status] || '';

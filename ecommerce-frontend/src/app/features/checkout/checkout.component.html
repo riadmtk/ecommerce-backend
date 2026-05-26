@@ -1,0 +1,143 @@
+<div class="checkout-container">
+
+  <div *ngIf="isLoading" class="loading">Chargement...</div>
+
+  <div *ngIf="!isLoading && order" class="checkout-content">
+
+    <!-- En-tête -->
+    <div class="checkout-header">
+      <h1>💳 Paiement</h1>
+      <p>Commande #{{ order.id | slice:0:8 }}...</p>
+    </div>
+      <a *ngIf="order" [routerLink]="['/orders', order.id]" class="btn-back-order">← Retour à la commande</a>
+
+    <div class="checkout-grid">
+
+      <!-- Colonne gauche : résumé commande -->
+      <div class="order-summary">
+        <h2>Résumé de la commande</h2>
+
+        <div class="order-items">
+          <div class="order-item" *ngFor="let item of order.items">
+            <span class="item-name">{{ item.productName }}</span>
+            <span class="item-qty">× {{ item.quantity }}</span>
+            <span class="item-price">{{ item.quantity * item.unitPrice | currencyMad }}</span>
+          </div>
+        </div>
+
+        <div class="order-total">
+          <span>Total</span>
+          <span class="total-amount">{{ order.totalAmount | currencyMad }}</span>
+        </div>
+
+        <div class="order-status-info">
+          <span class="label">Statut commande :</span>
+          <span class="status-badge">{{ getStatusLabel(order.status) }}</span>
+        </div>
+      </div>
+
+      <!-- Colonne droite : formulaire paiement -->
+      <div class="payment-form">
+
+        <!-- Étape 1 : choix méthode (avant initiation) -->
+        <div *ngIf="!payment" class="payment-method-selection">
+          <h2>Méthode de paiement</h2>
+
+          <div class="method-options">
+            <label class="method-option" [class.selected]="selectedMethod === 'STRIPE'">
+              <input type="radio" name="method" value="STRIPE"
+                     [(ngModel)]="selectedMethod" />
+              <div class="method-content">
+                <span class="method-icon">💳</span>
+                <div>
+                  <p class="method-name">Carte bancaire</p>
+                  <p class="method-desc">Visa, Mastercard, Amex</p>
+                </div>
+              </div>
+            </label>
+
+            <label class="method-option" [class.selected]="selectedMethod === 'PAYPAL'">
+              <input type="radio" name="method" value="PAYPAL"
+                     [(ngModel)]="selectedMethod" />
+              <div class="method-content">
+                <span class="method-icon">🅿️</span>
+                <div>
+                  <p class="method-name">PayPal</p>
+                  <p class="method-desc">Paiement sécurisé PayPal</p>
+                </div>
+              </div>
+            </label>
+          </div>
+
+          <div class="error-banner" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+          <button
+            class="btn-pay"
+            (click)="initiatePayment()"
+            [disabled]="isProcessing"
+          >
+            {{ isProcessing ? 'Préparation...' : 'Procéder au paiement' }}
+          </button>
+
+          <a routerLink="/orders" class="btn-cancel">Annuler</a>
+        </div>
+
+        <!-- Étape 2a : formulaire Stripe -->
+        <div *ngIf="payment && selectedMethod === 'STRIPE'" class="stripe-form">
+          <h2>Informations de carte</h2>
+
+          <div *ngIf="!stripeReady" class="loading-stripe">
+            Chargement du formulaire de paiement...
+          </div>
+
+          <div id="stripe-payment-element"></div>
+
+          <div class="success-banner" *ngIf="successMessage">
+            ✅ {{ successMessage }}
+          </div>
+          <div class="error-banner" *ngIf="errorMessage">
+            ❌ {{ errorMessage }}
+          </div>
+
+          <button
+            *ngIf="stripeReady"
+            class="btn-pay"
+            (click)="confirmStripePayment()"
+            [disabled]="isProcessing"
+          >
+            {{ isProcessing ? 'Traitement...' : 'Payer ' + (order.totalAmount | currencyMad) }}
+          </button>
+
+          <p class="secure-note">🔒 Paiement sécurisé par Stripe</p>
+        </div>
+
+        <!-- Étape 2b : PayPal -->
+        <div *ngIf="payment && selectedMethod === 'PAYPAL'" class="paypal-form">
+          <h2>Paiement PayPal</h2>
+
+          <div class="paypal-info">
+            <p>Vous allez être redirigé vers PayPal pour finaliser votre paiement.</p>
+            <p class="amount">Montant : <strong>{{ order.totalAmount | currencyMad }}</strong></p>
+          </div>
+
+          <div class="success-banner" *ngIf="successMessage">
+            ✅ {{ successMessage }}
+          </div>
+          <div class="error-banner" *ngIf="errorMessage">
+            ❌ {{ errorMessage }}
+          </div>
+
+          <button
+            class="btn-pay paypal-btn"
+            (click)="confirmPaypalPayment()"
+            [disabled]="isProcessing"
+          >
+            {{ isProcessing ? 'Traitement...' : '🅿️ Payer avec PayPal' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
