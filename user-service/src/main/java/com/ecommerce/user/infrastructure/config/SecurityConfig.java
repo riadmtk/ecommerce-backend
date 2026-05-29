@@ -40,6 +40,7 @@ public class SecurityConfig {
                         // Allow OPTIONS requests (Pre-flight checks) just in case they slip through the gateway
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Public endpoints
+                        .requestMatchers("/api/users/internal/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         // Everything else requires the JWT token

@@ -71,6 +71,9 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
 
         Product existingProduct = getProductById(command.id());
 
+        // 🎯 1. On mémorise l'ancien stock avant la mise à jour
+        int oldQuantity = existingProduct.getStockQuantity();
+
         existingProduct.setName(command.name());
         existingProduct.setDescription(command.description());
         existingProduct.setPrice(command.price());
@@ -80,6 +83,12 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
 
         Product updatedProduct = productRepositoryPort.save(existingProduct);
         eventPublisherPort.publishProductUpdated(updatedProduct);
+
+        // 🎯 2. Si le produit passe de Rupture (0) à En Stock (> 0), on déclenche l'événement !
+        if (oldQuantity == 0 && command.stockQuantity() > 0) {
+            eventPublisherPort.publishProductRestocked(updatedProduct.getId(), updatedProduct.getName());
+        }
+
         return updatedProduct;
     }
 
@@ -150,8 +159,15 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
     public void increaseStock(UUID productId, int quantity) {
         Product product = getProductById(productId);
 
-        product.setStockQuantity(product.getStockQuantity() + quantity);
+        // 🎯 1. On mémorise l'ancien stock
+        int oldQuantity = product.getStockQuantity();
 
+        product.setStockQuantity(oldQuantity + quantity);
         productRepositoryPort.save(product);
+
+        // 🎯 2. Détection du restockage
+        if (oldQuantity == 0 && (oldQuantity + quantity) > 0) {
+            eventPublisherPort.publishProductRestocked(productId, product.getName());
+        }
     }
 }

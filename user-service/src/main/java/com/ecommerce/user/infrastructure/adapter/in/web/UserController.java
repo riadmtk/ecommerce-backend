@@ -54,10 +54,21 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")   // ← Ajoutez cette annotation
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Récupérer un utilisateur par son ID (admin uniquement)")
     public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id) {
         User user = getUserUseCase.getById(id);
         return ResponseEntity.ok(UserResponse.from(user));
     }
+
+
+    @GetMapping("/internal/{id}/email")
+    @Operation(summary = "Route interne pour récupérer l'email (Inter-services)", hidden = true)
+    public ResponseEntity<InternalEmailResponse> getUserEmailInternal(@PathVariable("id") UUID id) {
+        User user = getUserUseCase.getById(id);
+        return ResponseEntity.ok(new InternalEmailResponse(user.getId(), user.getEmail()));
+    }
+
+    // Petit Record DTO interne pour formater la réponse JSON comme le Feign Client l'attend
+    public record InternalEmailResponse(UUID id, String email) {}
 }

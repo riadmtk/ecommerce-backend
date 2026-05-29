@@ -1,16 +1,36 @@
+server:
+  port: 8087
+
 spring:
   datasource:
-    url: jdbc:postgresql://${NOTIFICATION_DB_HOST:localhost}:${NOTIFICATION_DB_PORT:5432}/${NOTIFICATION_DB_NAME:ecommerce_notifications}
-    username: ${NOTIFICATION_DB_USERNAME:postgres}
-    password: ${NOTIFICATION_DB_PASSWORD:postgres}
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${PRODUCT_DB_HOST:localhost}:${PRODUCT_DB_PORT:5438}/${PRODUCT_DB_NAME:ecommerce_notifications}
+    username: ${PRODUCT_DB_USERNAME:postgres}
+    password: ${PRODUCT_DB_PASSWORD:postgres123}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update # Automatically creates the 'notifications' table for you
     show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  # Local Mock SMTP Server (e.g., Mailhog)
+  mail:
+    host: localhost
+    port: 1025
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+  # Local Kafka Broker
   kafka:
     bootstrap-servers: localhost:9092
-
-logging:
-  level:
-    com.ecommerce.notification: DEBUG
+    consumer:
+      group-id: notification-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"

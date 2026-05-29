@@ -5,6 +5,7 @@ import com.ecommerce.cart.domain.model.CartItem;
 import com.ecommerce.cart.domain.port.in.*;
 import com.ecommerce.cart.domain.port.out.CartRepositoryPort;
 import com.ecommerce.cart.domain.port.out.ProductClientPort;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
@@ -76,6 +77,7 @@ public class CartService implements AddProductToCartUseCase, GetCartUseCase, Rem
     }
 
     @Override
+    @Transactional
     public void clearCart(UUID userId) {
         Cart cart = getCartByUserId(userId);
 

@@ -1,13 +1,32 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${WISHLIST_DB_HOST:localhost}:${WISHLIST_DB_PORT:5432}/${WISHLIST_DB_NAME:ecommerce_wishlist}
+    url: jdbc:postgresql://${WISHLIST_DB_HOST:localhost}:${WISHLIST_DB_PORT:5439}/${WISHLIST_DB_NAME:ecommerce_wishlist}
     username: ${WISHLIST_DB_USERNAME:postgres}
-    password: ${WISHLIST_DB_PASSWORD:postgres}
-    driver-class-name: org.postgresql.Driver
+    password: ${WISHLIST_DB_PASSWORD:postgres123}
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: wishlist-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # C'est cette ligne qui fait la magie de String vers Map
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        # Autorise Spring à désérialiser n'importe quel JSON en Map
+        spring.json.trusted.packages: "*"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: java.util.Map
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
 
 logging:
   level:

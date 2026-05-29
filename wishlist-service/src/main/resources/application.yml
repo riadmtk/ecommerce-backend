@@ -9,6 +9,25 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          # Spring ira chercher la clé publique tout seul au démarrage !
+#          issuer-uri: https://ton-domaine-clerk.com  # ou l'URL de ton Keycloak
+
+jwt:
+  secret: ${JWT_SECRET:devSecretKeyForLocalTestingOnly-256bits!}
 
 server:
   port: 8088
+
+kafka:
+  topics:
+    wishlist-events: wishlist.events

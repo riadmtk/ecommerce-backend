@@ -8,4 +8,5 @@ public interface ProductEventPublisherPort {
     void publishProductDeleted(UUID productId);
     void publishProductCreated(Product product);
     void publishProductUpdated(Product product);
+    void publishProductRestocked(UUID productId, String productName);
 }

@@ -41,3 +41,4 @@ kafka:
   topics:
     payment-events: payment.events
     order-events: order.events
+    wishlist-events: wishlist.events

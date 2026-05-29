@@ -24,6 +24,9 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    private String resetToken;
+    private LocalDateTime resetTokenExpiry;
+
     public static User create(String firstName, String lastName,
                               String email, String encodedPassword) {
         return User.builder()
@@ -50,5 +53,25 @@ public class User {
                 .createdAt(this.createdAt)
                 .updatedAt(LocalDateTime.now())
                 .build();
+    }
+
+    public void requestPasswordReset(String token, int expirationMinutes) {
+        this.resetToken = token;
+        this.resetTokenExpiry = LocalDateTime.now().plusMinutes(expirationMinutes);
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void resetPassword(String newEncodedPassword) {
+        if (this.resetToken == null || this.resetTokenExpiry == null) {
+            throw new IllegalStateException("No password reset was requested.");
+        }
+        if (LocalDateTime.now().isAfter(this.resetTokenExpiry)) {
+            throw new IllegalStateException("Reset token has expired."); // You can create a specific Domain Exception for this!
+        }
+
+        this.password = newEncodedPassword;
+        this.resetToken = null; // Invalidate token after use
+        this.resetTokenExpiry = null;
+        this.updatedAt = LocalDateTime.now();
     }
 }

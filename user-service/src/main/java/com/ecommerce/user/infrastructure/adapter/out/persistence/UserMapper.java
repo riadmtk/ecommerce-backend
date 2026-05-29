@@ -18,6 +18,8 @@ public class UserMapper {
                 .role(entity.getRole())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
+                .resetToken(entity.getResetToken())
+                .resetTokenExpiry(entity.getResetTokenExpiry())
                 .build();
     }
 
@@ -32,6 +34,8 @@ public class UserMapper {
                 .role(user.getRole())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
+                .resetToken(user.getResetToken())
+                .resetTokenExpiry(user.getResetTokenExpiry())
                 .build();
     }
 }

@@ -22,7 +22,7 @@ public class CreateOrderService implements CreateOrderUseCase {
     private final OrderRepositoryPort orderRepository;
     private final ProductServiceClientPort productServiceClient;
     private final OrderEventPublisherPort eventPublisher;
-    private final CartServicePort cartServicePort;   // ← nouvelle dépendance
+    private final CartServicePort cartServicePort;
 
     @Override
     @Transactional
@@ -44,11 +44,9 @@ public class CreateOrderService implements CreateOrderUseCase {
         Order order = Order.create(command.userId(), items, command.shippingAddress());
         Order savedOrder = orderRepository.save(order);
 
-        // Vider le panier
-        cartServicePort.clearCart(command.userId(), command.token());
+        // 🎯 LE CORRECTIF EST ICI : On passe command.email() en deuxième paramètre !
+        eventPublisher.publishOrderCreated(savedOrder, command.email());
 
-        // Publier l'événement
-        eventPublisher.publishOrderCreated(savedOrder);
         return savedOrder;
     }
 }

@@ -22,7 +22,7 @@ public class OrderEventPublisherAdapter implements OrderEventPublisherPort {
     private String orderEventsTopic;
 
     @Override
-    public void publishOrderCreated(Order order) {
+    public void publishOrderCreated(Order order, String userEmail) {
         Map<String, Object> event = new LinkedHashMap<>();
         event.put("eventId", UUID.randomUUID().toString());
         event.put("eventType", "OrderCreated");
@@ -35,6 +35,7 @@ public class OrderEventPublisherAdapter implements OrderEventPublisherPort {
         payload.put("userId", order.getUserId().toString());
         payload.put("totalAmount", order.getTotalAmount());
         payload.put("status", order.getStatus().name());
+        payload.put("email", userEmail);
         // ➕ Ajouter les articles pour la mise à jour du stock
         List<Map<String, Object>> items = order.getItems().stream().map(item -> {
             Map<String, Object> map = new LinkedHashMap<>();
@@ -100,5 +101,24 @@ public class OrderEventPublisherAdapter implements OrderEventPublisherPort {
         event.put("payload", payload);
         kafkaTemplate.send(orderEventsTopic, order.getId().toString(), event);
         log.info("OrderRefunded event sent for order {}", order.getId());
+    }
+
+    @Override
+    public void publishOrderStatusUpdated(Order order, String previousStatus) {
+        Map<String, Object> event = new LinkedHashMap<>();
+        event.put("eventId", UUID.randomUUID().toString());
+        event.put("eventType", "OrderStatusUpdated");
+        event.put("timestamp", Instant.now().toString());
+        event.put("service", "order-service");
+        event.put("version", "1.0");
+
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("orderId", order.getId().toString());
+        payload.put("previousStatus", previousStatus);
+        payload.put("newStatus", order.getStatus().name());
+
+        event.put("payload", payload);
+        kafkaTemplate.send(orderEventsTopic, order.getId().toString(), event);
+        log.info("OrderStatusUpdated event sent for order {}", order.getId());
     }
 }
