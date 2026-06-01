@@ -22,7 +22,15 @@
         <p class="order-total">Total : {{ order.totalAmount | currencyMad }}</p>
         <p class="order-date">{{ order.createdAt | date:'dd/MM/yyyy' }}</p>
       </div>
-      <a [routerLink]="['/orders', order.id]" class="btn-detail">Voir le détail</a>
+      <div class="order-actions">
+        <a [routerLink]="['/orders', order.id]" class="btn-detail">Voir le détail</a>
+        <a *ngIf="order.status === 'PENDING'"
+          [routerLink]="['/payment-checkout']"
+          [queryParams]="{ orderId: order.id }"
+          class="btn-pay-now">
+          💳 Payer
+        </a>
+      </div>
     </div>
   </div>
 </div>

@@ -1,0 +1,17 @@
+<div class="paypal-cancel-container">
+  <div class="cancel-card">
+    <div class="icon">⚠️</div>
+    <h2>Paiement annulé</h2>
+    <p>Vous avez annulé le paiement PayPal.</p>
+    <p>Votre commande est conservée, vous pouvez réessayer quand vous voulez.</p>
+
+    <div class="actions">
+      <button class="btn-primary" (click)="retryPayment()">
+        🔁 Réessayer le paiement
+      </button>
+      <a routerLink="/orders" class="btn-secondary">
+        Voir mes commandes
+      </a>
+    </div>
+  </div>
+</div>

@@ -28,3 +28,9 @@ jwt:
   secret: "devSecretKeyForLocalTestingOnly-256bits!"
   expiration-ms: 86400000
 
+
+external:
+  kafka:
+    enabled: false   # true pour tester l'envoi vers GCP
+    bootstrap-servers: 136.115.254.39:9092
+    topic: ecommerce-events

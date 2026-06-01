@@ -5,10 +5,12 @@ spring:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: false
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
@@ -24,9 +26,12 @@ spring:
 server:
   port: 8086
 
+jwt:
+  secret: ${JWT_SECRET:devSecretKeyForLocalTestingOnly-256bits!}
+
 stripe:
-  api-key: ${STRIPE_API_KEY}
-  webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+  api-key: ${STRIPE_API_KEY:sk_test_51T9obaRU9nynbdRwdINFUiulliNbXBa2dtSrxHsbJLiHoSXd93LlSnqljpMWiGR5UNAB5WKvhK4gxcx2AM1NLD2000ApmcxZhW}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_9ed8a45f47d4a4ea08bdf6fafa051f065126f5b028d701082fbd91a9fc776070}
 
 paypal:
   client-id: ${PAYPAL_CLIENT_ID}
@@ -36,6 +41,4 @@ paypal:
 kafka:
   topics:
     order-created: order.events
-    payment-succeeded: payment.events
-    payment-failed: payment.events
-    payment-refunded: payment.events
+    payment-events: payment.events
