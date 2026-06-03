@@ -44,7 +44,7 @@ spring:
         - id: wishlist-service
           uri: http://wishlist-service:8088
           predicates:
-            - Path=/api/wishlist/**
+            - Path=/api/wishlists/**
 
 server:
   port: 8080

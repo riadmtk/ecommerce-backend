@@ -6,6 +6,7 @@ import com.ecommerce.user.infrastructure.adapter.out.persistence.entity.UserEnti
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,5 +42,12 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public Optional<User> findByResetToken(String token) {
         return jpaRepository.findByResetToken(token).map(mapper::toDomain);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return jpaRepository.findAll().stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 }

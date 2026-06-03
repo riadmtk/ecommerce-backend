@@ -1,47 +1,48 @@
 .global-search-container {
   display: flex;
   align-items: center;
-  position: relative; /* Crucial for placing the button inside */
+  position: relative;
   width: 100%;
-  max-width: 320px; /* Sleek and compact */
+  max-width: 320px;
 
   .search-input {
     width: 100%;
-    padding: 12px 45px 12px 20px; /* Big padding on the right to make room for the icon */
-    border: 2px solid #e1e8f0;
-    border-radius: 50px; /* The perfect pill shape */
+    padding: 12px 45px 12px 20px;
+    border: 2px solid var(--color-border);
+    border-radius: 50px;
     font-size: 0.95rem;
     outline: none;
-    background-color: #f8fafc;
-    transition: all 0.3s ease;
+    background-color: #ffffff;
+    color: var(--color-text-main);
+    transition: all var(--transition-fast);
 
     &:focus {
-      border-color: #5b62f4;
+      border-color: var(--color-forest-green);
       background-color: #ffffff;
-      box-shadow: 0 4px 12px rgba(91, 98, 244, 0.15);
+      box-shadow: 0 4px 12px rgba(47, 111, 78, 0.15);
     }
 
     &::placeholder {
-      color: #94a3b8;
+      color: var(--color-text-muted);
     }
   }
 
   .search-icon-btn {
     position: absolute;
-    right: 6px; /* Floating inside the input on the right */
+    right: 6px;
     top: 50%;
     transform: translateY(-50%);
-    background: #5b62f4;
-    color: white;
+    background: var(--color-forest-green);
+    color: var(--color-white);
     border: none;
-    border-radius: 50%; /* Perfect circle */
+    border-radius: 50%;
     width: 34px;
     height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.2s;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
 
     svg {
       width: 16px;
@@ -49,8 +50,8 @@
     }
 
     &:hover {
-      background-color: #4a51e2;
-      transform: translateY(-50%) scale(1.05); /* Slight pop on hover */
+      background-color: var(--color-dark-green);
+      transform: translateY(-50%) scale(1.05);
     }
   }
 }

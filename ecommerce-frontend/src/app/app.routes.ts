@@ -16,6 +16,14 @@ export const routes: Routes = [
         path: 'register',
         loadComponent: () =>
           import('./features/auth/register/register.component').then(m => m.RegisterComponent)
+      },
+      {
+        path: 'forgot-password',
+        loadComponent: () => import('./features/auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
+      },
+      {
+        path: 'reset-password',
+        loadComponent: () => import('./features/auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
       }
     ]
   },
@@ -29,19 +37,9 @@ export const routes: Routes = [
           import('./features/products/product-list/product-list.component').then(m => m.ProductListComponent)
       },
       {
-        path: 'add',
-        loadComponent: () =>
-          import('./features/products/product-form/product-form.component').then(m => m.ProductFormComponent)
-      },
-      {
         path: ':id',
         loadComponent: () =>
           import('./features/products/product-detail/product-detail.component').then(m => m.ProductDetailComponent)
-      },
-      {
-        path: ':id/edit',
-        loadComponent: () =>
-          import('./features/products/product-form/product-form.component').then(m => m.ProductFormComponent)
       }
     ]
   },
@@ -57,6 +55,13 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/cart/cart.component').then(m => m.CartComponent)
+  },
+
+  {
+    path: 'wishlist',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/wishlist/wishlist.component').then(m => m.WishlistComponent)
   },
 
   {
@@ -91,10 +96,19 @@ export const routes: Routes = [
   },
 
   {
-    path: 'admin/orders',
+    path: 'admin/dashboard',
     canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/admin/orders/admin-orders.component').then(m => m.AdminOrdersComponent)
+    loadComponent: () => import('./features/admin/dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+    children: [
+      { path: '', redirectTo: 'overview', pathMatch: 'full' },
+      { path: 'overview', loadComponent: () => import('./features/admin/dashboard/views/admin-overview.component').then(m => m.AdminOverviewComponent) },
+      { path: 'products', loadComponent: () => import('./features/admin/dashboard/views/admin-products.component').then(m => m.AdminProductsComponent) },
+      { path: 'products/add', loadComponent: () => import('./features/products/product-form/product-form.component').then(m => m.ProductFormComponent) },
+      { path: 'products/:id/edit', loadComponent: () => import('./features/products/product-form/product-form.component').then(m => m.ProductFormComponent) },
+      { path: 'orders', loadComponent: () => import('./features/admin/dashboard/views/admin-orders.component').then(m => m.AdminOrdersComponent) },
+      { path: 'orders/:id', loadComponent: () => import('./features/orders/order-detail/order-detail.component').then(m => m.OrderDetailComponent) },
+      { path: 'users', loadComponent: () => import('./features/admin/dashboard/views/admin-users.component').then(m => m.AdminUsersComponent) },
+    ]
   },
 
   {

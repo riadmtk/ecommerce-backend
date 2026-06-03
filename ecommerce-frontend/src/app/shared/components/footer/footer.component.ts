@@ -14,35 +14,38 @@ import { RouterModule } from '@angular/router';
         <a routerLink="/confidentialite">Confidentialité</a>
         <a routerLink="/cookies">Cookies</a>
       </div>
-      <p class="footer-copy">© 2026 MTK.ma – Tous droits réservés.</p>
+      <p class="footer-copy">© 2026 comcom.com – Tous droits réservés.</p>
     </footer>
   `,
   styles: [`
     .app-footer {
-      background: #1a1a2e;
-      color: #ccc;
+      background: var(--color-bg-card);
+      border-top: 1px solid var(--color-border);
+      color: var(--color-text-muted);
       text-align: center;
-      padding: 1.5rem;
-      margin-top: 3rem;
+      padding: var(--spacing-xl) var(--spacing-md);
+      margin-top: auto;
     }
     .footer-links {
       display: flex;
       justify-content: center;
-      gap: 2rem;
+      gap: var(--spacing-lg);
       flex-wrap: wrap;
-      margin-bottom: 1rem;
+      margin-bottom: var(--spacing-md);
     }
     .footer-links a {
-      color: #ccc;
+      color: var(--color-text-muted);
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 14px;
+      transition: color var(--transition-fast);
     }
     .footer-links a:hover {
-      color: white;
+      color: var(--color-forest-green);
     }
     .footer-copy {
-      font-size: 0.8rem;
-      color: #888;
+      font-size: 12px;
+      color: var(--color-text-muted);
+      opacity: 0.8;
     }
   `]
 })

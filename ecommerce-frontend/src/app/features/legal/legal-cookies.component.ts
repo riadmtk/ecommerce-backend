@@ -32,7 +32,7 @@ import { Component } from '@angular/core';
       <p><em>Note : le blocage des cookies strictement nécessaires peut altérer le fonctionnement du site.</em></p>
 
       <h2>Plus d'informations</h2>
-      <p>Pour toute question, contactez-nous à <a href="mailto:ecommerce@mtk.ma">ecommerce@mtk.ma</a>.</p>
+      <p>Pour toute question, contactez-nous à <a href="mailto:ecommerce@comcom.com">ecommerce@comcom.com</a>.</p>
 
       <div class="footer-note">Dernière mise à jour : 13 avril 2026</div>
     </div>

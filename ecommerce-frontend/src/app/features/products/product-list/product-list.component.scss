@@ -1,67 +1,63 @@
 .product-list-container, .search-page-container {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-
-  /* --- HEADER ALIGNMENT --- */
   .header-section {
     display: flex;
-    justify-content: space-between; /* Pushes H1 left, Search Bar right */
+    justify-content: space-between;
     align-items: center;
-    margin-bottom: 2.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--spacing-md);
 
     h1 {
-      font-size: 2rem;
-      color: #1e293b;
+      font-size: 32px;
       margin: 0;
-      font-weight: 700;
-    }
-
-    .search-container {
-      flex: 0 0 auto; /* Prevents the search bar from stretching */
     }
   }
 
-  /* ... Keep your loading, error, and no-results classes exactly the same ... */
+  .loading, .error-banner, .no-results {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--color-text-muted);
+    background: var(--color-bg-card);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--color-border);
+  }
 
-  /* --- MODERN PRODUCT CARDS --- */
   .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--spacing-lg);
 
     .product-card {
-      border: 1px solid #e2e8f0;
-      border-radius: 16px; /* Smoother, larger border radius */
-      padding: 1.2rem;
-      background: #ffffff;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-lg);
+      padding: var(--spacing-sm);
+      background: var(--color-bg-card);
+      transition: all var(--transition-normal);
       display: flex;
       flex-direction: column;
       position: relative;
+      overflow: hidden;
 
-      /* Elevated shadow effect on hover */
       &:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.05);
-        border-color: #cbd5e1;
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-hover);
+        border-color: transparent;
         
         img {
-          transform: scale(1.04); /* Image slightly zooms in on hover */
+          transform: scale(1.05);
         }
       }
 
       img {
         width: 100%;
-        height: 220px;
+        height: 200px;
         object-fit: contain;
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-        transition: transform 0.4s ease; /* Smooth zoom transition */
+        border-radius: var(--border-radius-md);
+        margin-bottom: var(--spacing-md);
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        mix-blend-mode: multiply;
       }
 
       .product-info {
@@ -70,61 +66,60 @@
         flex-direction: column;
 
         h3 {
-          margin: 0 0 0.5rem;
-          font-size: 1.15rem;
-          color: #0f172a;
+          margin: 0 0 var(--spacing-sm);
+          font-size: 20px;
+          color: var(--color-text-main);
           font-weight: 600;
         }
 
         .category {
-          font-size: 0.8rem;
-          color: #64748b;
-          margin: 0 0 1rem;
+          font-size: 13px;
+          color: var(--color-text-muted);
+          margin: 0 0 var(--spacing-md);
           text-transform: uppercase;
-          letter-spacing: 0.5px;
+          letter-spacing: 1px;
           font-weight: 600;
         }
 
         .price {
-          font-size: 1.4rem;
+          font-size: 24px;
           font-weight: 700;
-          color: #5b62f4; /* Use primary color for price to draw the eye */
-          margin: 0 0 1rem;
+          color: var(--color-forest-green);
+          margin: 0 0 var(--spacing-md);
         }
 
-        /* Upgraded Stock UI: Pills instead of plain text */
         .stock {
           display: inline-block;
-          padding: 4px 12px;
-          border-radius: 20px;
-          font-size: 0.8rem;
+          padding: 6px 14px;
+          border-radius: var(--border-radius-pill);
+          font-size: 13px;
           font-weight: 600;
-          background-color: #dcfce7;
-          color: #166534;
-          margin: 0 0 1.5rem;
+          background-color: var(--color-off-white);
+          color: var(--color-forest-green);
+          margin: 0 0 var(--spacing-lg);
           width: fit-content;
 
           &.out-of-stock {
-            background-color: #fee2e2;
-            color: #991b1b;
+            background-color: #FEE2E2;
+            color: #991B1B;
           }
         }
 
-        /* Upgraded Button: Bold Primary Action */
         .btn-detail {
           margin-top: auto;
           text-align: center;
-          background-color: #5b62f4; 
-          color: #ffffff;
-          padding: 0.8rem;
-          border-radius: 8px;
+          background-color: transparent;
+          border: 2px solid var(--color-forest-green);
+          color: var(--color-forest-green);
+          padding: 12px;
+          border-radius: var(--border-radius-pill);
           text-decoration: none;
           font-weight: 600;
-          transition: background-color 0.2s, box-shadow 0.2s;
+          transition: all var(--transition-fast);
 
           &:hover {
-            background-color: #4a51e2;
-            box-shadow: 0 4px 12px rgba(91, 98, 244, 0.3);
+            background-color: var(--color-forest-green);
+            color: var(--color-white);
           }
         }
       }

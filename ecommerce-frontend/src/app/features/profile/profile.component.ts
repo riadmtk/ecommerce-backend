@@ -1,13 +1,15 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { UserService } from '../../core/services/user.service';
+import { AuthService } from '../../core/auth/auth.service';
 import { User } from '../../core/models/user.model';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
@@ -20,8 +22,13 @@ export class ProfileComponent implements OnInit {
   successMessage = '';
   errorMessage = '';
 
+  isResetting = false;
+  resetMessage = '';
+  resetError = false;
+
   constructor(
     private userService: UserService,
+    private authService: AuthService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
   ) {
@@ -63,10 +70,34 @@ export class ProfileComponent implements OnInit {
         this.user = updatedUser;
         this.successMessage = 'Profil mis à jour avec succès';
         this.isSaving = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorMessage = 'Erreur lors de la mise à jour';
         this.isSaving = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  requestPasswordReset(): void {
+    if (!this.user?.email) return;
+    this.isResetting = true;
+    this.resetMessage = '';
+    this.resetError = false;
+    this.cdr.detectChanges();
+
+    this.authService.requestPasswordReset(this.user.email).subscribe({
+      next: () => {
+        this.resetMessage = 'Un email de réinitialisation vous a été envoyé.';
+        this.isResetting = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.resetMessage = 'Erreur lors de la demande de réinitialisation.';
+        this.resetError = true;
+        this.isResetting = false;
+        this.cdr.detectChanges();
       }
     });
   }

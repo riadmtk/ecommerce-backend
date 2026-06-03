@@ -8,19 +8,19 @@ import { Component } from '@angular/core';
       <h1>Mentions Légales</h1>
 
       <h2>Éditeur du site</h2>
-      <p>Le site <strong>MTK.ma</strong> est édité par :</p>
+      <p>Le site <strong>comcom.com</strong> est édité par :</p>
       <ul>
-        <li><strong>Raison sociale :</strong> MTK SARL</li>
+        <li><strong>Raison sociale :</strong> comcom SARL</li>
         <li><strong>Forme juridique :</strong> SARL</li>
         <li><strong>Capital social :</strong> 1 000 000 MAD</li>
         <li><strong>Siège social :</strong> Parc FES SHORE, Route Sidi Hrazem, 30000, FES, MAROC</li>
         <li><strong>Registre de Commerce :</strong> RC N° 990987 – Tribunal de Commerce de Fès</li>
         <li><strong>Identifiant Fiscal (IF) :</strong> 34567890</li>
         <li><strong>TVA :</strong> MA34567890</li>
-        <li><strong>Téléphone :</strong> <a href="tel:+212623854533">+212 6 23 85 45 33</a></li>
-        <li><strong>Email :</strong> <a href="mailto:ecommerce@mtk.ma">ecommerce@mtk.ma</a></li>
+        <li><strong>Téléphone :</strong> <a href="tel:+12345678900">+1 234 567 8900</a></li>
+        <li><strong>Email :</strong> <a href="mailto:ecommerce@comcom.com">ecommerce@comcom.com</a></li>
       </ul>
-      <p><strong>Directeur de la publication :</strong> MOUTAOUKIL Mohammed Riad</p>
+      <p><strong>Directeur de la publication :</strong> John Doe</p>
 
       <h2>Hébergement du site</h2>
       <p>Le site est hébergé par :</p>
@@ -31,7 +31,7 @@ import { Component } from '@angular/core';
       </ul>
 
       <h2>Propriété intellectuelle</h2>
-      <p>L'ensemble du contenu (textes, images, logos, vidéos, base de données) est la propriété exclusive de <strong>MTK SARL</strong> ou de ses partenaires. Toute reproduction, même partielle, est interdite sans autorisation préalable conformément au Dahir n° 1-05-192 portant promulgation de la loi n° 34-05 modifiant et complétant la loi n° 2-00 relative aux droits d'auteur et droits voisins.</p>
+      <p>L'ensemble du contenu (textes, images, logos, vidéos, base de données) est la propriété exclusive de <strong>comcom SARL</strong> ou de ses partenaires. Toute reproduction, même partielle, est interdite sans autorisation préalable conformément au Dahir n° 1-05-192 portant promulgation de la loi n° 34-05 modifiant et complétant la loi n° 2-00 relative aux droits d'auteur et droits voisins.</p>
 
       <div class="footer-note">
         Dernière mise à jour : 13 avril 2026

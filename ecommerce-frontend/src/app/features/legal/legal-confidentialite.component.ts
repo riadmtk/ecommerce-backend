@@ -8,7 +8,7 @@ import { Component } from '@angular/core';
       <h1>Politique de Confidentialité</h1>
 
       <h2>1. Identité du responsable de traitement</h2>
-      <p>Le responsable de traitement est <strong>MTK SARL</strong>, SARL au capital de 1 000 000 MAD, RC N° 990987, IF 34567890, dont le siège est à Parc FES SHORE, Route Sidi Hrazem, 30000 FES, MAROC.</p>
+      <p>Le responsable de traitement est <strong>comcom SARL</strong>, SARL au capital de 1 000 000 MAD, RC N° 990987, IF 34567890, dont le siège est à Parc FES SHORE, Route Sidi Hrazem, 30000 FES, MAROC.</p>
       <p>Le traitement a fait l'objet d'une déclaration auprès de la <strong>CNDP</strong> (Commission Nationale de contrôle de la protection des Données à caractère Personnel).</p>
 
       <h2>2. Données collectées</h2>
@@ -48,7 +48,7 @@ import { Component } from '@angular/core';
         <li><strong>Droit de rectification</strong> (article 8) : corriger des informations inexactes</li>
         <li><strong>Droit d'opposition</strong> (article 9) : pour motifs légitimes</li>
       </ul>
-      <p>Pour exercer ces droits, adressez-vous par email à <a href="mailto:privacy@mtk.ma">privacy@mtk.ma</a> ou par courrier à l'adresse du siège social. Vous disposez également du droit d'introduire une réclamation auprès de la <strong>CNDP</strong> (www.cndp.ma).</p>
+      <p>Pour exercer ces droits, adressez-vous par email à <a href="mailto:privacy@comcom.com">privacy@comcom.com</a> ou par courrier à l'adresse du siège social. Vous disposez également du droit d'introduire une réclamation auprès de la <strong>CNDP</strong> (www.cndp.ma).</p>
 
       <h2>7. Sécurité des données</h2>
       <p>Nous mettons en œuvre toutes les mesures techniques et organisationnelles appropriées (chiffrement SSL, accès restreint, etc.) pour garantir la sécurité des données, conformément à la loi 05-20 relative à la cybersécurité.</p>

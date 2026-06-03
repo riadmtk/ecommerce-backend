@@ -4,14 +4,6 @@
     <a routerLink="/products" class="btn-back">
       ← Retour au catalogue
     </a>
-    <div class="action-buttons" *ngIf="isAdmin$ | async">
-      <a [routerLink]="['/products', product?.id, 'edit']" class="btn-edit">
-        Modifier le produit
-      </a>
-      <button (click)="deleteProduct()" class="btn-delete" [disabled]="isDeleting">
-        {{ isDeleting ? 'Suppression...' : ' Supprimer le produit' }}
-      </button>
-    </div>
   </div>
 
   <div *ngIf="isLoading" class="loading">Chargement...</div>
@@ -31,24 +23,30 @@
           {{ product.stockQuantity > 0 ? product.stockQuantity + ' en stock' : 'Rupture de stock' }}
         </span>
       </div>
-      <ng-container *ngIf="!(isAdmin$ | async)">
-        <button class="btn-add-cart" [disabled]="product.stockQuantity === 0" (click)="openAddToCartModal()">
+      
+      <div class="client-actions">
+        <button class="btn-primary btn-add-cart" [disabled]="product.stockQuantity === 0" (click)="openAddToCartModal()">
           {{ product.stockQuantity > 0 ? 'Ajouter au panier' : 'Indisponible' }}
         </button>
-      </ng-container>
+        
+        <button class="btn-wishlist" (click)="toggleWishlist()" [disabled]="isProcessingWishlist" [class.active]="isWishlisted">
+          <svg xmlns="http://www.w3.org/2000/svg" [attr.fill]="isWishlisted ? '#ef4444' : 'none'" viewBox="0 0 24 24" [attr.stroke]="isWishlisted ? '#ef4444' : 'currentColor'" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
+      </div>
+
     </div>
   </div>
 
-  <!-- Message de succès -->
   <div class="cart-success-banner" *ngIf="cartSuccessMessage">
     {{ cartSuccessMessage }}
   </div>
 
-  <!-- MODALE DE CHOIX DE QUANTITÉ -->
   <div class="modal-overlay" *ngIf="showAddToCartModal" (click)="closeAddToCartModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <h2>Ajouter au panier</h2>
-      <p>{{ product?.name }}</p>
+      <p class="modal-product-name">{{ product?.name }}</p>
       <div class="quantity-selector">
         <button (click)="decrementQuantity()" [disabled]="quantity <= 1">−</button>
         <input type="number" [(ngModel)]="quantity" min="1" [max]="product?.stockQuantity ?? 0" />
@@ -59,7 +57,7 @@
       </p>
       <div class="modal-actions">
         <button class="btn-cancel" (click)="closeAddToCartModal()">Annuler</button>
-        <button class="btn-confirm" (click)="confirmAddToCart()" [disabled]="addingToCart">
+        <button class="btn-primary btn-confirm" (click)="confirmAddToCart()" [disabled]="addingToCart">
           {{ addingToCart ? 'Ajout...' : 'Confirmer' }}
         </button>
       </div>

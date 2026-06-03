@@ -87,6 +87,22 @@ export class AuthService {
       error: () => this.logout()
     });
   }
+  
+  requestPasswordReset(email: string): Observable<any> {
+    return this.http.post(
+      `${environment.services.users}/forgot-password`, 
+      { email }, 
+      { responseType: 'text' } 
+    );
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<any> {
+    return this.http.post(
+      `${environment.services.users}/reset-password`, 
+      { token, newPassword }, 
+      { responseType: 'text' }
+    );
+  }
 
   private decodeToken(token: string): any {
     try {

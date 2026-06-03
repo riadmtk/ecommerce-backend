@@ -5,6 +5,7 @@ import com.ecommerce.wishlist.domain.model.WishlistItem;
 import com.ecommerce.wishlist.domain.port.in.AddProductToWishlistUseCase;
 import com.ecommerce.wishlist.domain.port.in.GetWishlistUseCase;
 import com.ecommerce.wishlist.domain.port.in.RemoveProductFromWishlistUseCase;
+import com.ecommerce.wishlist.domain.port.in.UpdateWishlistItemUseCase;
 import com.ecommerce.wishlist.domain.port.out.ProductServiceClientPort;
 import com.ecommerce.wishlist.domain.port.out.NotificationEventPort;
 import com.ecommerce.wishlist.domain.port.out.UserServiceClientPort;
@@ -24,7 +25,7 @@ import java.util.UUID;
 public class WishlistService implements
         AddProductToWishlistUseCase,
         RemoveProductFromWishlistUseCase,
-        GetWishlistUseCase {
+        GetWishlistUseCase, UpdateWishlistItemUseCase {
 
     private final WishlistRepositoryPort wishlistRepository;
     private final ProductServiceClientPort productServiceClient;
@@ -73,6 +74,27 @@ public class WishlistService implements
         return wishlistRepository.findByUserId(userId)
                 .orElseGet(() -> Wishlist.create(userId));
     }
+
+    @Override
+    @Transactional
+    public void updateRestockNotification(UUID userId, UUID productId, boolean notifyOnRestock) {
+        wishlistRepository.findByUserId(userId).ifPresent(wishlist -> {
+
+            wishlist.getItems().stream()
+                    .filter(item -> item.getProductId().equals(productId))
+                    .findFirst()
+                    .ifPresent(item -> {
+                        if (notifyOnRestock) {
+                            item.enableRestockNotification();
+                        } else {
+                            item.disableRestockNotification();
+                        }
+                    });
+
+            wishlistRepository.save(wishlist);
+        });
+    }
+
 
     @Transactional(readOnly = true) // C'est une lecture seule côté Wishlist, l'écriture se fait côté Notification
     public void handleProductRestocked(UUID productId, String productName) {

@@ -1,0 +1,59 @@
+<div class="admin-view-container">
+  <div class="view-header">
+    <h1>Gestion des Utilisateurs</h1>
+    <div class="search-bar">
+      <input type="text" [(ngModel)]="searchTerm" (input)="filterUsers()" placeholder="Rechercher par ID, Nom, Email..." />
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Chargement des utilisateurs...</div>
+
+  <div class="table-container" *ngIf="!isLoading">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nom complet</th>
+          <th>Email</th>
+          <th>Rôle</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers">
+          <td class="id-cell" title="Copier l'ID" (click)="copyId(user.id!)" style="cursor: pointer; color: #1d4ed8;">
+            {{ user.id }}
+            <span *ngIf="copiedId === user.id" style="color: #16a34a; font-size: 11px; margin-left: 4px;">(Copié)</span>
+          </td>
+          <td>{{ user.firstName }} {{ user.lastName }}</td>
+          <td>{{ user.email }}</td>
+          <td><span class="role-badge" [class.admin]="user.role === 'ADMIN'">{{ user.role }}</span></td>
+          <td>
+            <button class="btn-action view" (click)="viewUser(user.id!)">Voir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div *ngIf="filteredUsers.length === 0" class="no-results">
+      Aucun utilisateur trouvé.
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="selectedUser" (click)="closeUserModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Détails de l'utilisateur</h2>
+        <button class="btn-close" (click)="closeUserModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>ID:</strong> {{ selectedUser.id }}</p>
+        <p><strong>Prénom:</strong> {{ selectedUser.firstName }}</p>
+        <p><strong>Nom:</strong> {{ selectedUser.lastName }}</p>
+        <p><strong>Email:</strong> {{ selectedUser.email }}</p>
+        <p><strong>Téléphone:</strong> {{ selectedUser.phoneNumber || 'N/A' }}</p>
+        <p><strong>Rôle:</strong> {{ selectedUser.role }}</p>
+      </div>
+    </div>
+  </div>
+</div>

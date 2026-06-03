@@ -42,6 +42,7 @@ public class SecurityConfig {
                         // Public endpoints
                         .requestMatchers("/api/users/internal/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/users/forgot-password", "/api/users/reset-password").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         // Everything else requires the JWT token
                         .anyRequest().authenticated()

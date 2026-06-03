@@ -7,6 +7,7 @@ import com.ecommerce.user.domain.port.out.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -25,5 +26,9 @@ public class GetUserService implements GetUserUseCase {
     public User getByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
+    }
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }

@@ -1,0 +1,53 @@
+<div class="admin-view-container">
+  <div class="view-header">
+    <h1>Gestion des Produits</h1>
+    <div class="header-actions" style="display: flex; gap: 16px;">
+      <div class="search-bar">
+        <input type="text" [(ngModel)]="searchTerm" (input)="filterProducts()" placeholder="Rechercher par ID ou Nom..." />
+      </div>
+      <a routerLink="/admin/dashboard/products/add" class="btn-primary" style="padding: 10px 16px; border-radius: 8px; text-decoration: none; font-size: 14px;">
+        + Nouveau Produit
+      </a>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Chargement des produits...</div>
+
+  <div class="table-container" *ngIf="!isLoading">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nom</th>
+          <th>Prix</th>
+          <th>Stock</th>
+          <th>Gérer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of filteredProducts">
+          <td class="id-cell" title="Copier l'ID" (click)="copyId(product.id!)" style="cursor: pointer; color: #1d4ed8;">
+            {{ product.id }} 
+            <span *ngIf="copiedId === product.id" style="color: #16a34a; font-size: 11px; margin-left: 4px;">(Copié)</span>
+          </td>
+          <td>{{ product.name }}</td>
+          <td>{{ product.price | currency:'MAD':'symbol' }}</td>
+          <td>
+            <span class="stock-badge" [class.out]="product.stockQuantity === 0">{{ product.stockQuantity }}</span>
+          </td>
+          <td>
+            <div style="display: flex; gap: 8px;">
+              <a [routerLink]="['/admin/dashboard/products', product.id, 'edit']" class="btn-action view" style="text-decoration: none;">Éditer</a>
+              <button class="btn-action" style="background: #fef2f2; color: #dc2626;" (click)="softDelete(product)">Désactiver</button>
+              <button class="btn-action" style="background: #7f1d1d; color: white;" (click)="hardDelete(product)">Supprimer</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div *ngIf="filteredProducts.length === 0" class="no-results">
+      Aucun produit trouvé.
+    </div>
+  </div>
+</div>

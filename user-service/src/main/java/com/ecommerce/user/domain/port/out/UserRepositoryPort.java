@@ -2,6 +2,7 @@ package com.ecommerce.user.domain.port.out;
 
 import com.ecommerce.user.domain.model.User;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,4 +12,6 @@ public interface UserRepositoryPort {
     Optional<User> findByEmail(String email);
     Optional<User> findByResetToken(String token);
     boolean existsByEmail(String email);
+
+    List<User> findAll();
 }

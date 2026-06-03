@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -6,9 +6,10 @@ import { ProductService } from '../../../core/services/product.service';
 import { Product } from '../../../core/models/product.model';
 import { AuthService } from '../../../core/auth/auth.service';
 import { CartService } from '../../../core/services/cart.service';
+import { WishlistService } from '../../../core/services/wishlist.service'; // 👈 IMPORT
 import { CurrencyMadPipe } from '../../../shared/pipes/currency-mad.pipe';
-import { Observable, map } from 'rxjs';
-import { environment } from '../../../../environments/environment'; // ← ADDED IMPORT
+import { Observable, Subscription, map } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-product-detail',
@@ -17,7 +18,7 @@ import { environment } from '../../../../environments/environment'; // ← ADDED
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.scss']
 })
-export class ProductDetailComponent implements OnInit {
+export class ProductDetailComponent implements OnInit, OnDestroy {
 
   product: Product | null = null;
   isLoading = true;
@@ -31,11 +32,17 @@ export class ProductDetailComponent implements OnInit {
   addingToCart: boolean = false;
   cartSuccessMessage: string = '';
 
+  // 🎯 Gestion de la Wishlist
+  isWishlisted: boolean = false;
+  isProcessingWishlist: boolean = false;
+  private wishlistSub!: Subscription;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private productService: ProductService,
     private cartService: CartService,
+    private wishlistService: WishlistService, // 👈 INJECTED
     private cdr: ChangeDetectorRef,
     public authService: AuthService
   ) {
@@ -55,6 +62,18 @@ export class ProductDetailComponent implements OnInit {
       next: (product) => {
         this.product = product;
         this.isLoading = false;
+        
+        // 🎯 On s'abonne aux changements de la wishlist pour mettre à jour l'icône
+        if (this.authService.isLoggedIn()) {
+          // Charge le panier initial
+          this.wishlistService.getWishlist().subscribe();
+          
+          this.wishlistSub = this.wishlistService.wishlist$.subscribe(() => {
+            this.isWishlisted = this.wishlistService.isInWishlist(product.id);
+            this.cdr.detectChanges();
+          });
+        }
+        
         this.cdr.detectChanges();
       },
       error: () => {
@@ -65,7 +84,51 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  // --- Panier ---
+  ngOnDestroy(): void {
+    if (this.wishlistSub) {
+      this.wishlistSub.unsubscribe();
+    }
+  }
+
+  // --- 🎯 Nouvelle Logique Wishlist ---
+  toggleWishlist(): void {
+    if (!this.product) return;
+    
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+
+    this.isProcessingWishlist = true;
+
+    if (this.isWishlisted) {
+      this.wishlistService.removeProduct(this.product.id).subscribe({
+        next: () => {
+          this.isProcessingWishlist = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.isProcessingWishlist = false;
+        }
+      });
+    } else {
+      // Si le stock est à 0, on active la notification de restockage !
+      const notify = this.product.stockQuantity === 0;
+      
+      this.wishlistService.addProduct({ productId: this.product.id, notifyOnRestock: notify }).subscribe({
+        next: () => {
+          this.isProcessingWishlist = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.isProcessingWishlist = false;
+        }
+      });
+    }
+  }
+
+  // ... (keep all your existing Cart, Delete, and getProductImage methods here) ...
+  
   openAddToCartModal(): void {
     if (!this.product) return;
     this.quantity = 1;
@@ -112,7 +175,6 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
-  // --- Suppression produit (admin) ---
   deleteProduct(): void {
     if (!this.product) return;
     const confirmDelete = confirm(
@@ -123,7 +185,7 @@ export class ProductDetailComponent implements OnInit {
     this.isDeleting = true;
     this.productService.delete(this.product.id).subscribe({
       next: () => {
-        this.router.navigate(['/products']);
+        this.router.navigate(['/admin/dashboard/products']);
       },
       error: () => {
         this.errorMessage = 'Erreur lors de la suppression du produit';
@@ -133,7 +195,6 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  // --- NOUVELLE MÉTHODE D'AIDE POUR L'AFFICHAGE DES IMAGES ---
   getProductImage(product: Product): string {
     if (product.images && product.images.length > 0) {
       const mainImage = product.images.find(img => img.isPrimary) || product.images[0];

@@ -1,36 +1,43 @@
 <nav class="navbar">
   <div class="navbar-brand">
-    <a routerLink="/products">🛒 E-Commerce</a>
+    <a routerLink="/products">Comcom</a>
   </div>
 
-  <!-- Nouveau groupe de liens de navigation -->
   <div class="navbar-nav">
     <a routerLink="/products" routerLinkActive="active">Catalogue</a>
-    <a routerLink="/products/add" *ngIf="isAdmin$ | async" routerLinkActive="active">
-      Ajouter produit
-    </a>
-
-    <a routerLink="/admin/orders" *ngIf="isAdmin$ | async" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Gestion des commandes</a>
-
-    <a routerLink="/cart" *ngIf="!(isAdmin$ | async)" routerLinkActive="active">Mon panier</a>
-
     <ng-container *ngIf="authService.isLoggedIn()">
-      <a routerLink="/orders" *ngIf="!(isAdmin$ | async)" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Mes Commandes</a>
-      <a routerLink="/profile" routerLinkActive="active">Mon Profil</a>
-    </ng-container>
-
-    <ng-container *ngIf="!authService.isLoggedIn()">
-      <a routerLink="/auth/login" routerLinkActive="active">Connexion</a>
-      <a routerLink="/auth/register" routerLinkActive="active" class="btn-register">
-        S'inscrire
-      </a>
+      <a routerLink="/orders" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Mes Commandes</a>
     </ng-container>
   </div>
 
-  <!-- Bouton Déconnexion (seul à droite) -->
-  <div class="navbar-links">
+  <div class="navbar-actions">
+    <!-- Icon Links -->
+    <div class="icon-links">
+      <a routerLink="/wishlist" class="icon-btn" title="Mes favoris">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </a>
+      <a routerLink="/cart" class="icon-btn" title="Mon panier">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      </a>
+      <a *ngIf="authService.isLoggedIn()" routerLink="/profile" class="icon-btn" title="Mon Profil">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      </a>
+    </div>
+
+    <!-- Auth Buttons -->
+    <ng-container *ngIf="!authService.isLoggedIn()">
+      <a routerLink="/auth/login" class="btn-text">Connexion</a>
+      <a routerLink="/auth/register" class="btn-primary">S'inscrire</a>
+    </ng-container>
+
     <ng-container *ngIf="authService.isLoggedIn()">
-      <button (click)="logout()" class="btn-logout">Déconnexion</button>
+      <button (click)="logout()" class="btn-secondary">Déconnexion</button>
     </ng-container>
   </div>
 </nav>

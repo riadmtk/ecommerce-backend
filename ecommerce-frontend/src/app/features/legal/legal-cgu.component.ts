@@ -8,7 +8,7 @@ import { Component } from '@angular/core';
       <h1>Conditions Générales d'Utilisation (CGU)</h1>
 
       <h2>Article 1 – Acceptation</h2>
-      <p>L'accès et l'utilisation du site <strong>MTK.ma</strong> sont soumis à l'acceptation et au respect des présentes CGU. Le simple fait de naviguer sur le site vaut acceptation.</p>
+      <p>L'accès et l'utilisation du site <strong>comcom.com</strong> sont soumis à l'acceptation et au respect des présentes CGU. Le simple fait de naviguer sur le site vaut acceptation.</p>
 
       <h2>Article 2 – Création de compte</h2>
       <p>Pour passer commande, l'utilisateur doit créer un compte en fournissant des informations exactes et complètes. L'utilisateur est responsable de la confidentialité de ses identifiants. Toute activité effectuée via son compte est réputée être de son fait. Le compte pourra être suspendu ou supprimé en cas de non-respect des présentes CGU.</p>

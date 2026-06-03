@@ -1,61 +1,112 @@
 .navbar {
   display: flex;
-  align-items: center;            // supprimé justify-content: space-between
-  padding: 16px 32px;
-  background: #1a1a2e;
-  color: white;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: 0 4px 20px rgba(15, 47, 42, 0.05);
+  border-bottom: 1px solid var(--color-border);
 
   .navbar-brand a {
-    color: white;
+    color: var(--color-dark-green);
     text-decoration: none;
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
   }
 
-  // Nouveau conteneur pour les liens principaux (gauche)
   .navbar-nav {
     display: flex;
     align-items: center;
-    gap: 24px;
-    margin-left: 32px;            // espacement après le logo
+    gap: var(--spacing-lg);
 
     a {
-      color: #ccc;
+      color: var(--color-text-muted);
       text-decoration: none;
-      font-size: 14px;
-      transition: color 0.2s;
+      font-size: 16px;
+      font-weight: 500;
+      transition: color var(--transition-fast);
+      padding: var(--spacing-sm) 0;
+      position: relative;
 
-      &:hover, &.active { color: white; }
+      &:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0%;
+        height: 2px;
+        background-color: var(--color-light-green);
+        transition: width var(--transition-normal);
+        border-radius: 2px;
+      }
 
-      &.btn-register {
-        background: #4f46e5;
-        color: white;
-        padding: 8px 18px;
-        border-radius: 8px;
+      &:hover {
+        color: var(--color-forest-green);
+        &:after { width: 100%; }
+      }
 
-        &:hover { background: #4338ca; }
+      &.active {
+        color: var(--color-dark-green);
+        &:after {
+          width: 100%;
+          background-color: var(--color-forest-green);
+        }
       }
     }
   }
 
-  // Conteneur pour le bouton Déconnexion (droite)
-  .navbar-links {
-    margin-left: auto;            // pousse à droite
+  .navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
 
-    .btn-logout {
-      background: none;
-      border: 1px solid #ccc;
-      color: #ccc;
-      padding: 6px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s;
+    .icon-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-right: 12px;
+      padding-right: 16px;
+      border-right: 1px solid var(--color-border);
 
-      &:hover { border-color: white; color: white; }
+      .icon-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        color: var(--color-dark-green);
+        text-decoration: none;
+        transition: all var(--transition-fast);
+        background: transparent;
+
+        svg {
+          width: 24px;
+          height: 24px;
+        }
+
+        &:hover {
+          background: #e2e8f0;
+          color: var(--color-forest-green);
+        }
+      }
+    }
+
+    .btn-text {
+      color: var(--color-forest-green);
+      font-weight: 500;
+      text-decoration: none;
+      padding: var(--spacing-sm) var(--spacing-md);
+      transition: color var(--transition-fast);
+      &:hover {
+        color: var(--color-dark-green);
+      }
     }
   }
 }

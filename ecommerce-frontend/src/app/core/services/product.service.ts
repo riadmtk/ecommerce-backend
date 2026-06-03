@@ -9,13 +9,16 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  // Retourne désormais un tableau simple de produits
   getAll(): Observable<Product[]> {
     return this.http.get<Product[]>(environment.services.products);
   }
 
   getById(id: string): Observable<Product> {
     return this.http.get<Product>(`${environment.services.products}/${id}`);
+  }
+
+  getByIdAdmin(id: string): Observable<Product> {
+    return this.http.get<Product>(`${environment.services.products}/${id}/admin`);
   }
 
   create(product: Partial<Product>): Observable<Product> {
@@ -28,5 +31,23 @@ export class ProductService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${environment.services.products}/${id}`);
+  }
+
+  hardDelete(id: string): Observable<void> {
+    return this.http.delete<void>(`${environment.services.products}/${id}/hard`);
+  }
+
+  increaseStock(id: string, amount: number): Observable<Product> {
+    return this.http.patch<Product>(`${environment.services.products}/${id}/stock/increase`, { amount });
+  }
+
+  decreaseStock(id: string, amount: number): Observable<Product> {
+    return this.http.patch<Product>(`${environment.services.products}/${id}/stock/decrease`, { amount });
+  }
+
+  uploadImages(files: File[]): Observable<string[]> {
+    const formData = new FormData();
+    files.forEach(file => formData.append('images', file));
+    return this.http.post<string[]>(`${environment.services.products}/upload-images`, formData);
   }
 }

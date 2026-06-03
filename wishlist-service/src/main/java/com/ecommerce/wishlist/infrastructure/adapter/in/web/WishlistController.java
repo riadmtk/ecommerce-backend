@@ -5,6 +5,7 @@ import com.ecommerce.wishlist.domain.port.in.AddProductToWishlistUseCase;
 import com.ecommerce.wishlist.domain.port.in.AddProductToWishlistUseCase.AddProductCommand;
 import com.ecommerce.wishlist.domain.port.in.GetWishlistUseCase;
 import com.ecommerce.wishlist.domain.port.in.RemoveProductFromWishlistUseCase;
+import com.ecommerce.wishlist.domain.port.in.UpdateWishlistItemUseCase;
 import com.ecommerce.wishlist.infrastructure.adapter.in.web.dto.AddProductRequest;
 import com.ecommerce.wishlist.infrastructure.adapter.in.web.dto.WishlistResponse;
 import jakarta.validation.Valid;
@@ -26,6 +27,7 @@ public class WishlistController {
     private final AddProductToWishlistUseCase addProductUseCase;
     private final RemoveProductFromWishlistUseCase removeProductUseCase;
     private final GetWishlistUseCase getWishlistUseCase;
+    private final UpdateWishlistItemUseCase updateWishlistItemUseCase;
 
     @GetMapping("/me")
     public ResponseEntity<WishlistResponse> getMyWishlist(@AuthenticationPrincipal Jwt jwt) {
@@ -52,6 +54,18 @@ public class WishlistController {
         addProductUseCase.addProduct(command);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PatchMapping("/items/{productId}/notify")
+    public ResponseEntity<Void> updateNotifyOnRestock(
+            @PathVariable UUID productId,
+            @RequestParam boolean notify,
+            @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt) {
+
+        UUID userId = UUID.fromString(jwt.getSubject());
+        updateWishlistItemUseCase.updateRestockNotification(userId, productId, notify);
+
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/items/{productId}")

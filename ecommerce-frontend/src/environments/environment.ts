@@ -9,6 +9,7 @@ export const environment = {
     orders: 'http://localhost:8080/api/orders',
     payments: 'http://localhost:8080/api/payments',
     search: 'http://localhost:8080/api/v1/search',
-    cart: 'http://localhost:8080/api/v1/carts'
+    cart: 'http://localhost:8080/api/v1/carts',
+    wishlists: 'http://localhost:8080/api/v1/wishlists'
   }
 };

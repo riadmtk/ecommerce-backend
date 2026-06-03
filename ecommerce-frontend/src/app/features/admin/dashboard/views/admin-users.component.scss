@@ -1,0 +1,161 @@
+.admin-view-container {
+  .view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      color: #1a1a2e;
+    }
+
+    .search-bar {
+      input {
+        padding: 10px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        width: 300px;
+        font-size: 14px;
+        outline: none;
+
+        &:focus {
+          border-color: var(--color-forest-green);
+          box-shadow: 0 0 0 3px rgba(47, 111, 78, 0.1);
+        }
+      }
+    }
+  }
+
+  .table-container {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+  }
+
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: #475569;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .id-cell {
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #64748b;
+    }
+
+    .role-badge {
+      padding: 4px 10px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #e2e8f0;
+      color: #475569;
+
+      &.admin {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+    }
+
+    .btn-action {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &.view {
+        background: #eff6ff;
+        color: #1d4ed8;
+
+        &:hover {
+          background: #dbeafe;
+        }
+      }
+    }
+  }
+
+  .no-results, .loading {
+    padding: 32px;
+    text-align: center;
+    color: #64748b;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h2 { margin: 0; font-size: 18px; color: #1e293b; }
+      
+      .btn-close {
+        background: none; border: none; font-size: 24px; color: #94a3b8; cursor: pointer;
+        &:hover { color: #0f172a; }
+      }
+    }
+
+    .modal-body {
+      padding: 24px;
+
+      p {
+        margin: 0 0 12px 0;
+        color: #334155;
+        font-size: 15px;
+
+        strong {
+          color: #0f172a;
+          display: inline-block;
+          width: 100px;
+        }
+      }
+    }
+  }
+}

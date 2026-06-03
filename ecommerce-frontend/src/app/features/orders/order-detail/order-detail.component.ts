@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { OrderService } from '../../../core/services/order.service';
 import { PaymentService } from '../../../core/services/payment.service';
@@ -12,7 +13,7 @@ import { Observable, map } from 'rxjs';
 @Component({
   selector: 'app-order-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, CurrencyMadPipe],
+  imports: [CommonModule, RouterModule, CurrencyMadPipe, FormsModule],
   templateUrl: './order-detail.component.html',
   styleUrls: ['./order-detail.component.scss']
 })
@@ -25,6 +26,7 @@ export class OrderDetailComponent implements OnInit {
   isAdmin$: Observable<boolean>;
   isRefunding = false;
   refundSuccess = false;
+  statusOptions = ['PENDING', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUND_REQUESTED', 'REFUNDED'];
 
   constructor(
     private route: ActivatedRoute,

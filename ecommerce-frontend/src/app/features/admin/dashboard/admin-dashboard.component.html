@@ -1,0 +1,27 @@
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <h2>Admin Panel</h2>
+      <a routerLink="/" class="back-to-site">← Retour au site</a>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a routerLink="/admin/dashboard/overview" routerLinkActive="active" class="nav-item">
+        📊 Vue d'ensemble
+      </a>
+      <a routerLink="/admin/dashboard/products" routerLinkActive="active" class="nav-item">
+        📦 Produits
+      </a>
+      <a routerLink="/admin/dashboard/orders" routerLinkActive="active" class="nav-item">
+        🛒 Commandes
+      </a>
+      <a routerLink="/admin/dashboard/users" routerLinkActive="active" class="nav-item">
+        👥 Utilisateurs
+      </a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <router-outlet></router-outlet>
+  </main>
+</div>

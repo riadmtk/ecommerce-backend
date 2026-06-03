@@ -8,7 +8,7 @@ import { Component } from '@angular/core';
       <h1>Conditions Générales de Vente (CGV)</h1>
 
       <h2>Article 1 – Objet et champ d'application</h2>
-      <p>Les présentes Conditions Générales de Vente régissent les relations contractuelles entre <strong>MTK SARL</strong> (ci-après "le Vendeur") et toute personne physique ou morale effectuant un achat sur le site <strong>MTK.ma</strong> (ci-après "le Client"). Toute commande implique l'acceptation sans réserve des présentes CGV.</p>
+      <p>Les présentes Conditions Générales de Vente régissent les relations contractuelles entre <strong>comcom SARL</strong> (ci-après "le Vendeur") et toute personne physique ou morale effectuant un achat sur le site <strong>comcom.com</strong> (ci-après "le Client"). Toute commande implique l'acceptation sans réserve des présentes CGV.</p>
 
       <h2>Article 2 – Produits</h2>
       <p>Les produits proposés sont décrits avec la plus grande exactitude possible. Les photographies sont non contractuelles. Le Vendeur se réserve le droit de modifier l'assortiment à tout moment.</p>

@@ -1,56 +1,88 @@
-<div class="profile-container">
-  <h1>Mon Profil</h1>
-
+<div class="profile-layout">
   <div *ngIf="isLoading" class="loading">Chargement...</div>
 
-  <div *ngIf="!isLoading" class="profile-content">
-
-    <div class="profile-info-card">
-      <div class="avatar">{{ user?.firstName?.charAt(0) }}{{ user?.lastName?.charAt(0) }}</div>
-      <div>
-        <h2>{{ user?.firstName }} {{ user?.lastName }}</h2>
-        <p>{{ user?.email }}</p>
-        <span class="role-badge" [class.admin]="user?.role === 'ADMIN'">
-          {{ user?.role === 'ADMIN' ? 'Administrateur' : 'Client' }}
-        </span>
+  <ng-container *ngIf="!isLoading">
+    <!-- Header Banner -->
+    <div class="profile-header">
+      <div class="header-cover"></div>
+      <div class="header-content">
+        <div class="avatar-wrapper">
+          <div class="avatar">{{ user?.firstName?.charAt(0) }}{{ user?.lastName?.charAt(0) }}</div>
+        </div>
+        <div class="user-titles">
+          <h1>{{ user?.firstName }} {{ user?.lastName }}</h1>
+          <p class="email">{{ user?.email }}</p>
+          <span class="role-badge" [class.admin]="user?.role === 'ADMIN'">
+            {{ user?.role === 'ADMIN' ? 'Administrateur' : 'Client' }}
+          </span>
+        </div>
       </div>
     </div>
 
-    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
-      <h3>Modifier mes informations</h3>
+    <!-- Main Content -->
+    <div class="profile-body">
+      <!-- Sidebar Actions -->
+      <aside class="profile-sidebar">
+        <div class="sidebar-card">
+          <h3>Actions du compte</h3>
+          <p class="sidebar-text">Gérez la sécurité de votre compte et accédez à vos espaces réservés.</p>
+          
+          <button (click)="requestPasswordReset()" [disabled]="isResetting" class="btn-secondary">
+            {{ isResetting ? 'Envoi en cours...' : 'Réinitialiser le mot de passe' }}
+          </button>
+          
+          <div *ngIf="resetMessage" class="status-msg" [class.error]="resetError" [class.success]="!resetError">
+            {{ resetMessage }}
+          </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label>Prénom</label>
-          <input type="text" formControlName="firstName" />
-          <span class="error-msg"
-            *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched">
-            Prénom requis
-          </span>
+          <hr class="divider" *ngIf="user?.role === 'ADMIN'" />
+          
+          <a *ngIf="user?.role === 'ADMIN'" routerLink="/admin/dashboard" class="btn-primary-outline">
+            Dashboard Administrateur
+          </a>
         </div>
+      </aside>
 
-        <div class="form-group">
-          <label>Nom</label>
-          <input type="text" formControlName="lastName" />
-          <span class="error-msg"
-            *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">
-            Nom requis
-          </span>
+      <!-- Profile Form -->
+      <main class="profile-main">
+        <div class="form-card">
+          <h3>Informations personnelles</h3>
+          <p class="card-subtitle">Mettez à jour vos informations de contact et votre profil public.</p>
+
+          <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Prénom</label>
+                <input type="text" formControlName="firstName" />
+                <span class="error-msg" *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched">
+                  Prénom requis
+                </span>
+              </div>
+              <div class="form-group">
+                <label>Nom</label>
+                <input type="text" formControlName="lastName" />
+                <span class="error-msg" *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">
+                  Nom requis
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Téléphone</label>
+              <input type="tel" formControlName="phoneNumber" placeholder="+212 ..." />
+            </div>
+
+            <div class="form-actions">
+              <div class="success-banner" *ngIf="successMessage">{{ successMessage }}</div>
+              <div class="error-banner" *ngIf="errorMessage">{{ errorMessage }}</div>
+              
+              <button type="submit" [disabled]="profileForm.invalid || isSaving" class="btn-save">
+                {{ isSaving ? 'Sauvegarde...' : 'Enregistrer les modifications' }}
+              </button>
+            </div>
+          </form>
         </div>
-      </div>
-
-      <div class="form-group">
-        <label>Téléphone</label>
-        <input type="tel" formControlName="phoneNumber" placeholder="Téléphone" />
-      </div>
-
-      <div class="success-banner" *ngIf="successMessage">{{ successMessage }}</div>
-      <div class="error-banner" *ngIf="errorMessage">{{ errorMessage }}</div>
-
-      <button type="submit" [disabled]="profileForm.invalid || isSaving">
-        {{ isSaving ? 'Sauvegarde...' : 'Sauvegarder' }}
-      </button>
-    </form>
-
-  </div>
+      </main>
+    </div>
+  </ng-container>
 </div>

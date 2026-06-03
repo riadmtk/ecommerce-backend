@@ -27,6 +27,7 @@ export class CartComponent implements OnInit {
     loadCart(): void {
         this.isLoading = true;
         this.errorMessage = '';
+        this.cdr.detectChanges();
         this.cartService.getEnrichedCart().subscribe({
             next: ({ itemsDetailed }) => {
                 this.items = itemsDetailed;
@@ -44,7 +45,10 @@ export class CartComponent implements OnInit {
     removeItem(productId: string): void {
         this.cartService.removeItem(productId).subscribe({
             next: () => this.loadCart(),
-            error: () => this.errorMessage = 'Erreur lors de la suppression'
+            error: () => {
+                this.errorMessage = 'Erreur lors de la suppression';
+                this.cdr.detectChanges();
+            }
         });
     }
 
@@ -70,7 +74,10 @@ export class CartComponent implements OnInit {
         }
         this.cartService.updateItemQuantity(productId, newQuantity).subscribe({
             next: () => this.loadCart(),
-            error: () => this.errorMessage = 'Erreur lors de la mise à jour'
+            error: () => {
+                this.errorMessage = 'Erreur lors de la mise à jour';
+                this.cdr.detectChanges();
+            }
         });
     }
 

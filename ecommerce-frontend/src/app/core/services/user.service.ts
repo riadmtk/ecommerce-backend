@@ -16,4 +16,13 @@ export class UserService {
   updateProfile(data: Partial<User>): Observable<User> {
     return this.http.put<User>(`${environment.services.users}/me`, data);
   }
+
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${environment.services.users}/all`);
+  }
+
+  getUserById(id: string): Observable<User> {
+    return this.http.get<User>(`${environment.services.users}/${id}`);
+  }
+
 }

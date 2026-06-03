@@ -123,7 +123,7 @@ export class ProductFormComponent implements OnInit {
       next: () => {
         this.successMessage = this.isEditMode ? 'Produit mis a jour' : 'Produit cree';
         this.isSaving = false;
-        setTimeout(() => this.router.navigate(['/products', this.productId || '']), 1500);
+        setTimeout(() => this.router.navigate(['/admin/dashboard/products']), 1500);
       },
       error: () => {
         this.errorMessage = 'Erreur lors de la sauvegarde';
@@ -133,11 +133,7 @@ export class ProductFormComponent implements OnInit {
   }
 
   cancel(): void {
-    if (this.isEditMode && this.productId) {
-      this.router.navigate(['/products', this.productId]);
-    } else {
-      this.router.navigate(['/products']);
-    }
+    this.router.navigate(['/admin/dashboard/products']);
   }
 
   // --- ADDED HELPER FOR IMAGE PREVIEW ---

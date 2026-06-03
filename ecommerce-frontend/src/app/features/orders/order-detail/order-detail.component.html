@@ -1,7 +1,7 @@
 <div class="order-detail-container">
 
   <!-- Bouton retour pour les admins -->
-  <button *ngIf="isAdmin$ | async" class="btn-back" routerLink="/admin/orders">
+  <button *ngIf="isAdmin$ | async" class="btn-back" routerLink="/admin/dashboard/orders">
     ← Retour à la gestion des commandes
   </button>
 
@@ -24,7 +24,14 @@
           📍 {{ order.shippingAddress }}
         </p>
       </div>
-      <span class="order-status" [class]="getStatusClass(order.status)">
+      
+      <!-- Dropdown pour Admin -->
+      <select *ngIf="isAdmin$ | async" [ngModel]="order.status" (ngModelChange)="changeStatus($event)" class="status-dropdown">
+        <option *ngFor="let status of statusOptions" [value]="status">{{ getStatusLabel(status) }}</option>
+      </select>
+
+      <!-- Tag pour Client -->
+      <span *ngIf="!(isAdmin$ | async)" class="order-status" [class]="getStatusClass(order.status)">
         {{ getStatusLabel(order.status) }}
       </span>
     </div>
@@ -42,29 +49,7 @@
     </div>
 
     <!-- Actions administrateur -->
-    <div class="order-actions" *ngIf="isAdmin$ | async">
-      <div class="admin-actions">
-        <h3>🔧 Gestion de la commande</h3>
-        <div class="status-buttons">
-          
-          <button *ngIf="order.status === 'PAID'" (click)="changeStatus('PROCESSING')" class="btn-primary">
-            En préparation
-          </button>
-          <button *ngIf="order.status === 'PROCESSING'" (click)="changeStatus('SHIPPED')" class="btn-primary">
-            Expédier
-          </button>
-          <button *ngIf="order.status === 'SHIPPED'" (click)="changeStatus('DELIVERED')" class="btn-primary">
-            Marquer comme livrée
-          </button>
-          <!--<button *ngIf="order.status === 'DELIVERED'" (click)="changeStatus('REFUNDED')" class="btn-warning">
-            Rembourser
-          </button>-->
-          <button *ngIf="canCancel(order.status)" (click)="cancelOrder()" class="btn-danger">
-            Annuler
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- (Supprimé car on gère le statut uniquement avec le menu déroulant en haut) -->
 
     <!-- Articles commandés -->
     <div class="order-items">
@@ -106,7 +91,7 @@
           ❌ Le dernier paiement a échoué :
           <em>{{ payment?.failureReason }}</em>
         </p>
-        <a *ngIf="canPay()" [routerLink]="['/payment-checkout']" [queryParams]="{ orderId: order.id }"
+        <a *ngIf="canPay() && !(isAdmin$ | async)" [routerLink]="['/payment-checkout']" [queryParams]="{ orderId: order.id }"
           class="btn-pay-link">
           💳 Payer maintenant
         </a>
