@@ -1,0 +1,28 @@
+<div class="custom-dropdown">
+  <div class="dropdown-trigger" (click)="toggleDropdown()">
+    <span class="selected-label">{{ getSelectedLabel() || placeholder }}</span>
+    <span class="arrow">▼</span>
+  </div>
+  
+  <div class="dropdown-menu" *ngIf="isOpen" (click)="$event.stopPropagation()">
+    <ul class="menu-list">
+      <li class="menu-item" *ngIf="allowEmpty" (click)="selectCategory('')">
+        <div class="item-content empty-option">{{ emptyLabel }}</div>
+      </li>
+      <ng-container *ngTemplateOutlet="nodeTemplate; context:{ $implicit: categories }"></ng-container>
+    </ul>
+  </div>
+</div>
+
+<ng-template #nodeTemplate let-nodes>
+  <li *ngFor="let node of nodes" class="menu-item" [class.has-children]="node.children && node.children.length > 0">
+    <div class="item-content" (click)="selectCategory(node.id)" [class.selected]="node.id === selectedId">
+      <span class="node-name">{{ node.name }}</span>
+      <span class="caret" *ngIf="node.children && node.children.length > 0">▶</span>
+    </div>
+    
+    <ul class="sub-menu" *ngIf="node.children && node.children.length > 0">
+      <ng-container *ngTemplateOutlet="nodeTemplate; context:{ $implicit: node.children }"></ng-container>
+    </ul>
+  </li>
+</ng-template>

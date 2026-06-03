@@ -102,6 +102,10 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'overview', pathMatch: 'full' },
       { path: 'overview', loadComponent: () => import('./features/admin/dashboard/views/admin-overview.component').then(m => m.AdminOverviewComponent) },
+      
+      // --- NEW CATEGORIES ROUTE ---
+      { path: 'categories', loadComponent: () => import('./features/admin/dashboard/views/admin-categories.component').then(m => m.AdminCategoriesComponent) },
+      
       { path: 'products', loadComponent: () => import('./features/admin/dashboard/views/admin-products.component').then(m => m.AdminProductsComponent) },
       { path: 'products/add', loadComponent: () => import('./features/products/product-form/product-form.component').then(m => m.ProductFormComponent) },
       { path: 'products/:id/edit', loadComponent: () => import('./features/products/product-form/product-form.component').then(m => m.ProductFormComponent) },

@@ -3,14 +3,17 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ProductService } from '../../../core/services/product.service';
+import { CategoryService } from '../../../core/services/category.service';
 import { ImageUploadService } from '../../../core/services/image-upload.service';
 import { Product } from '../../../core/models/product.model';
-import { environment } from '../../../../environments/environment'; // ← Import added for the preview URL
+import { CategoryNode } from '../../../core/models/category.model';
+import { environment } from '../../../../environments/environment';
+import { CategoryDropdownComponent } from '../../../shared/components/category-dropdown/category-dropdown.component';
 
 @Component({
   selector: 'app-product-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, CategoryDropdownComponent],
   templateUrl: './product-form.component.html',
   styleUrls: ['./product-form.component.scss']
 })
@@ -23,25 +26,13 @@ export class ProductFormComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   
-  // Array of filenames for display
   selectedFileNames: string[] = [];
-
-  categories: string[] = [
-    'Sport',
-    'Électronique',
-    'Vêtements',
-    'Maison & Jardin',
-    'Alimentation',
-    'Jouets',
-    'Beauté & Santé',
-    'Automobile',
-    'Livres',
-    'Autre'
-  ];
+  categoryTree: CategoryNode[] = [];
 
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
+    private categoryService: CategoryService,
     private imageUploadService: ImageUploadService,
     private route: ActivatedRoute,
     private router: Router,
@@ -52,8 +43,8 @@ export class ProductFormComponent implements OnInit {
       description: [''],
       price: [0, [Validators.required, Validators.min(0.01)]],
       stockQuantity: [0, [Validators.required, Validators.min(0)]],
-      category: [''],
-      imageUrls: [[]] // Array of image URLs
+      categoryId: [''],
+      imageUrls: [[]] 
     });
   }
 
@@ -61,10 +52,15 @@ export class ProductFormComponent implements OnInit {
     this.productId = this.route.snapshot.paramMap.get('id');
     this.isEditMode = !!this.productId;
 
+    this.categoryService.getAll().subscribe({
+      next: (categories) => {
+        this.categoryTree = this.categoryService.buildTree(categories);
+      }
+    });
+
     if (this.isEditMode && this.productId) {
       this.productService.getById(this.productId).subscribe({
         next: (product) => {
-          // Extract string URLs from ProductImage objects
           const extractedUrls = product.images ? product.images.map(img => img.imageUrl) : [];
 
           this.productForm.patchValue({
@@ -72,7 +68,7 @@ export class ProductFormComponent implements OnInit {
             description: product.description,
             price: product.price,
             stockQuantity: product.stockQuantity,
-            category: product.category,
+            categoryId: product.categoryId || (product.category && product.category.id ? product.category.id : product.category) || '',
             imageUrls: extractedUrls 
           });
           
@@ -94,8 +90,6 @@ export class ProductFormComponent implements OnInit {
     
     if (files && files.length > 0) {
       const fileArray = Array.from(files);
-      
-      // Update UI with all selected filenames
       this.selectedFileNames = fileArray.map(f => f.name);
       
       this.imageUploadService.uploadImages(fileArray).subscribe({
@@ -136,7 +130,6 @@ export class ProductFormComponent implements OnInit {
     this.router.navigate(['/admin/dashboard/products']);
   }
 
-  // --- ADDED HELPER FOR IMAGE PREVIEW ---
   getPreviewUrl(): string | null {
     const urls = this.productForm.get('imageUrls')?.value;
     if (urls && urls.length > 0) {

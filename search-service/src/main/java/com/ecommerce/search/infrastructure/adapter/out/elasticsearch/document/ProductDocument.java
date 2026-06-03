@@ -35,11 +35,15 @@ public class ProductDocument {
     @Field(type = FieldType.Boolean)
     private boolean active;
 
-    // --- ADDED NEW FIELDS ---
+    // 🚀 NEW: Store the ID for exact filtering
     @Field(type = FieldType.Keyword)
-    private String category;
+    private UUID categoryId;
 
-    // index = false because we don't need to search BY the image URL text
+    // 🚀 TRICK: We name this field "category" in Elasticsearch so your
+    // existing multi_match @Query doesn't break when searching by text!
+    @Field(name = "category", type = FieldType.Text)
+    private String categoryName;
+
     @Field(type = FieldType.Keyword, index = false)
     private List<String> imageUrls;
 }

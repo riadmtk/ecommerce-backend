@@ -1,0 +1,110 @@
+<div class="admin-view-container">
+  <div class="view-header">
+    <h1>Vue d'ensemble</h1>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    Chargement des statistiques...
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+    <!-- Top KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg></div>
+        <div class="kpi-info">
+          <span class="label">Commandes</span>
+          <span class="value">{{ totalOrders }}</span>
+        </div>
+      </div>
+      
+      <div class="kpi-card">
+        <div class="kpi-icon"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+        <div class="kpi-info">
+          <span class="label">Utilisateurs</span>
+          <span class="value">{{ totalUsers }}</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
+        <div class="kpi-info">
+          <span class="label">Revenu</span>
+          <span class="value">{{ totalRevenue | currency:'MAD':'symbol' }}</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div>
+        <div class="kpi-info">
+          <span class="label">Produits actifs</span>
+          <span class="value">{{ activeProducts }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="dashboard-content">
+      <!-- Left Column: Recent Activity -->
+      <div class="card recent-activity">
+        <h2>Aperçu des commandes</h2>
+        
+        <div class="activity-timeline">
+          <div class="activity-item" *ngFor="let order of recentOrders; let first = first">
+            <div class="timeline-dot" [class.latest]="first"></div>
+            <div class="timeline-content">
+              <p class="title">Commande #{{ order.id?.substring(0, 8) }} <span class="status-badge" [ngClass]="'status-' + order.status.toLowerCase().replace('_', '-')">{{ order.status }}</span></p>
+              <p class="amount">Total: {{ order.totalAmount | currency:'MAD':'symbol' }}</p>
+              <p class="time">{{ order.createdAt | date:'short' }}</p>
+            </div>
+          </div>
+          
+          <div *ngIf="recentOrders.length === 0" class="no-data">Aucune commande récente.</div>
+        </div>
+      </div>
+
+      <!-- Right Column: Chart -->
+      <div class="card chart-container">
+        <h2>Commandes Par Mois</h2>
+        <p class="subtitle">Évolution sur les 6 derniers mois</p>
+
+        <div class="svg-chart-wrapper">
+          <svg viewBox="0 0 600 200" preserveAspectRatio="none" class="line-chart">
+            <defs>
+              <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--color-forest-green, #16a34a)" stop-opacity="0.4" />
+                <stop offset="100%" stop-color="var(--color-forest-green, #16a34a)" stop-opacity="0.0" />
+              </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <line x1="40" y1="20" x2="560" y2="20" class="grid-line" />
+            <line x1="40" y1="100" x2="560" y2="100" class="grid-line" />
+            <line x1="40" y1="180" x2="560" y2="180" class="grid-line" />
+            
+            <!-- Y-Axis Labels -->
+            <text x="30" y="25" class="axis-label y-label">{{ maxChartValue }}</text>
+            <text x="30" y="105" class="axis-label y-label">{{ maxChartValue / 2 | number:'1.0-0' }}</text>
+            <text x="30" y="185" class="axis-label y-label">0</text>
+
+            <!-- Area Path (Gradient) -->
+            <polygon [attr.points]="getAreaPoints()" class="chart-area" fill="url(#chartGradient)" />
+
+            <!-- Line Path -->
+            <polyline [attr.points]="getChartPoints()" class="chart-line" />
+
+            <!-- Data Points & X-Axis Labels -->
+            <g *ngFor="let data of monthlyOrders; let i = index">
+              <circle 
+                [attr.cx]="getPointX(i)" 
+                [attr.cy]="getPointY(data.count)" 
+                r="4.5" 
+                class="data-point" 
+              />
+              <text [attr.x]="getPointX(i)" y="195" class="axis-label x-label">{{ data.month }}</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

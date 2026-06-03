@@ -10,6 +10,6 @@ public record UpdateProductCommand(
         String description,
         BigDecimal price,
         int stockQuantity,
-        String category,
+        UUID categoryId,
         List<String> imageUrls
 ) {}

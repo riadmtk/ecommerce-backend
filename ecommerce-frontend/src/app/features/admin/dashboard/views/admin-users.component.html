@@ -29,7 +29,10 @@
           <td>{{ user.email }}</td>
           <td><span class="role-badge" [class.admin]="user.role === 'ADMIN'">{{ user.role }}</span></td>
           <td>
-            <button class="btn-action view" (click)="viewUser(user.id!)">Voir</button>
+            <svg (click)="viewUser(user.id!)" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="action-icon view-icon" style="cursor: pointer; color: #3b82f6; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
           </td>
         </tr>
       </tbody>

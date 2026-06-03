@@ -15,7 +15,7 @@ import lombok.*;
 public class Product {
     private UUID id;
     private String name;
-    private String category;
+    private Category category;
     private String description;
     private BigDecimal price;
     private int stockQuantity;

@@ -12,8 +12,6 @@ import java.util.UUID;
 public class SearchResponse {
 
     private List<ProductSummary> results;
-
-    // Metadata for the frontend to build pagination UI
     private int totalElements;
 
     @Data
@@ -25,7 +23,13 @@ public class SearchResponse {
         private BigDecimal price;
         private int stockQuantity;
         private boolean inStock;
+
+        // 🚀 NEW: Add the ID for future filtering
+        private UUID categoryId;
+
+        // Keeps the name 'category' so the Angular UI continues working flawlessly
         private String category;
+
         private List<String> imageUrls;
     }
 }

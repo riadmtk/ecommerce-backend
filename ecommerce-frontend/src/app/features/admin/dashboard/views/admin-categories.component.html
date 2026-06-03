@@ -1,0 +1,84 @@
+<div class="admin-view-container">
+  
+  <div class="view-header">
+    <h1>Gestion des Catégories</h1>
+    <button class="btn-primary" (click)="openModalForAdd()">+ AJOUTER UNE CATÉGORIE</button>
+  </div>
+
+  <div class="tree-card">
+    <ng-template #treeTemplate let-nodes="nodes">
+      <ul class="tree-list">
+        <li *ngFor="let node of nodes">
+          <div class="tree-row">
+            <div class="node-content">
+              <span class="chevron" 
+                    (click)="node.expanded = !node.expanded" 
+                    [style.visibility]="node.children && node.children.length ? 'visible' : 'hidden'">
+                <svg *ngIf="!node.expanded" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                <svg *ngIf="node.expanded" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </span>
+              <span class="node-name" (click)="node.expanded = !node.expanded">{{ node.name }}</span>
+            </div>
+            
+            <div class="actions">
+              <!-- Edit Icon (Pencil) -->
+              <svg class="icon edit" (click)="editCategory(node, $event)" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+              <!-- Delete Icon (Trash) -->
+              <svg class="icon delete" (click)="deleteCategory(node.id, $event)" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </div>
+          </div>
+
+          <div class="children-container" *ngIf="node.expanded && node.children && node.children.length > 0">
+            <ng-container *ngTemplateOutlet="treeTemplate; context: { nodes: node.children }"></ng-container>
+          </div>
+        </li>
+      </ul>
+    </ng-template>
+
+    <div *ngIf="categoryTree.length === 0" class="no-results">
+      Aucune catégorie trouvée.
+    </div>
+
+    <ng-container *ngTemplateOutlet="treeTemplate; context: { nodes: categoryTree }"></ng-container>
+  </div>
+
+  <!-- Modal for Form -->
+  <div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ isEditing ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}</h2>
+        <button class="btn-close" (click)="closeModal()">×</button>
+      </div>
+      
+      <form (ngSubmit)="saveCategory()">
+        <div class="form-group">
+          <label>Nom de la catégorie</label>
+          <input type="text" [(ngModel)]="categoryForm.name" name="name" required />
+        </div>
+        
+        <div class="form-group">
+          <label>Catégorie Parente</label>
+          <select [(ngModel)]="categoryForm.parentId" name="parentId">
+            <option [ngValue]="null">-- Catégorie Racine --</option>
+            <option *ngFor="let cat of getFlatListForDropdown()" [ngValue]="cat.id" [disabled]="cat.id === currentCategoryId">
+              {{ cat.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeModal()">Annuler</button>
+          <button type="submit" class="btn-primary" [disabled]="!categoryForm.name">{{ isEditing ? 'Mettre à jour' : 'Ajouter' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

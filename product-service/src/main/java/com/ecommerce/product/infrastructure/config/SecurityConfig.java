@@ -50,6 +50,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/products/**").hasRole("ADMIN")
 
+                        .requestMatchers(HttpMethod.GET, "/api/v1/categories", "/api/v1/categories/**").permitAll()
+                        .requestMatchers("/api/v1/categories", "/api/v1/categories/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 // On dit à Spring : "Tu es un Resource Server, attends-toi à recevoir un JWT"

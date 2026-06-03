@@ -1,9 +1,11 @@
 package com.ecommerce.product.application.service;
 
+import com.ecommerce.product.domain.model.Category;
 import com.ecommerce.product.domain.model.Product;
 import com.ecommerce.product.domain.model.ProductImage;
 import com.ecommerce.product.domain.exception.ResourceNotFoundException;
 import com.ecommerce.product.domain.port.in.*;
+import com.ecommerce.product.domain.port.out.CategoryRepositoryPort;
 import com.ecommerce.product.domain.port.out.ProductRepositoryPort;
 import com.ecommerce.product.domain.port.out.ProductEventPublisherPort;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,9 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
     private final ProductRepositoryPort productRepositoryPort;
     private final ProductEventPublisherPort eventPublisherPort;
 
-    // --- Helper Method to build Domain Images ---
+    // ✅ INJECTED CATEGORY REPOSITORY
+    private final CategoryRepositoryPort categoryRepositoryPort;
+
     private List<ProductImage> buildImages(List<String> imageUrls) {
         List<ProductImage> productImages = new ArrayList<>();
         if (imageUrls != null && !imageUrls.isEmpty()) {
@@ -37,7 +41,6 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
         return productImages;
     }
 
-    // --- POST ---
     @Override
     @Transactional
     public Product execute(CreateProductCommand command) {
@@ -45,12 +48,19 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
             throw new IllegalArgumentException("Product price must be strictly positive.");
         }
 
+        // 🎯 Fetch Category Domain Object
+        Category category = null;
+        if (command.categoryId() != null) {
+            category = categoryRepositoryPort.findById(command.categoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + command.categoryId()));
+        }
+
         Product newProduct = Product.builder()
                 .name(command.name())
                 .description(command.description())
                 .price(command.price())
                 .stockQuantity(command.stockQuantity())
-                .category(command.category())
+                .category(category) // ← Save the Domain Object
                 .images(buildImages(command.imageUrls()))
                 .active(true)
                 .createdAt(LocalDateTime.now())
@@ -61,7 +71,6 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
         return createdProduct;
     }
 
-    // --- PUT ---
     @Override
     @Transactional
     public Product execute(UpdateProductCommand command) {
@@ -70,21 +79,25 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
         }
 
         Product existingProduct = getProductById(command.id());
-
-        // 🎯 1. On mémorise l'ancien stock avant la mise à jour
         int oldQuantity = existingProduct.getStockQuantity();
+
+        // 🎯 Fetch Category Domain Object
+        Category category = null;
+        if (command.categoryId() != null) {
+            category = categoryRepositoryPort.findById(command.categoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + command.categoryId()));
+        }
 
         existingProduct.setName(command.name());
         existingProduct.setDescription(command.description());
         existingProduct.setPrice(command.price());
         existingProduct.setStockQuantity(command.stockQuantity());
-        existingProduct.setCategory(command.category());
+        existingProduct.setCategory(category); // ← Update the Domain Object
         existingProduct.setImages(buildImages(command.imageUrls()));
 
         Product updatedProduct = productRepositoryPort.save(existingProduct);
         eventPublisherPort.publishProductUpdated(updatedProduct);
 
-        // 🎯 2. Si le produit passe de Rupture (0) à En Stock (> 0), on déclenche l'événement !
         if (oldQuantity == 0 && command.stockQuantity() > 0) {
             eventPublisherPort.publishProductRestocked(updatedProduct.getId(), updatedProduct.getName());
         }
@@ -92,7 +105,6 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
         return updatedProduct;
     }
 
-    // --- GET ADMIN (Interne) ---
     @Override
     @Transactional(readOnly = true)
     public Product getAdminProductById(UUID id) {
@@ -100,7 +112,6 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
     }
 
-    // --- GET CLIENT ---
     @Override
     @Transactional(readOnly = true)
     public Product getProductById(UUID id) {
@@ -113,15 +124,13 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
         return product;
     }
 
-    // --- GET LIST ---
     @Override
     public List<Product> getAllProducts() {
         return productRepositoryPort.findAllSortedByDate().stream()
-                .filter(Product::isActive) // toujours filtrer les inactifs
+                .filter(Product::isActive)
                 .toList();
     }
 
-    // --- SOFT DELETE ---
     @Override
     @Transactional
     public void deleteProduct(UUID id) {
@@ -131,12 +140,10 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
         eventPublisherPort.publishProductDeleted(id);
     }
 
-    // --- HARD DELETE ---
     @Override
     @Transactional
     public void hardDeleteProduct(UUID id) {
         getAdminProductById(id);
-
         productRepositoryPort.deleteById(id);
         eventPublisherPort.publishProductDeleted(id);
     }
@@ -145,12 +152,10 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
     @Transactional
     public void decreaseStock(UUID productId, int quantity) {
         Product product = getProductById(productId);
-
         if (product.getStockQuantity() < quantity) {
             throw new IllegalStateException("Insufficient stock for product: " + product.getName());
         }
         product.setStockQuantity(product.getStockQuantity() - quantity);
-
         productRepositoryPort.save(product);
     }
 
@@ -158,14 +163,10 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
     @Transactional
     public void increaseStock(UUID productId, int quantity) {
         Product product = getProductById(productId);
-
-        // 🎯 1. On mémorise l'ancien stock
         int oldQuantity = product.getStockQuantity();
-
         product.setStockQuantity(oldQuantity + quantity);
         productRepositoryPort.save(product);
 
-        // 🎯 2. Détection du restockage
         if (oldQuantity == 0 && (oldQuantity + quantity) > 0) {
             eventPublisherPort.publishProductRestocked(productId, product.getName());
         }

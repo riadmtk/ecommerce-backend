@@ -26,11 +26,12 @@
     </div>
 
     <div class="form-group">
-      <label for="category">Catégorie</label>
-      <select id="category" formControlName="category">
-        <option value="" disabled>Sélectionnez une catégorie</option>
-        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-      </select>
+      <label>Catégorie</label>
+      <app-category-dropdown 
+        [categories]="categoryTree" 
+        [selectedId]="productForm.get('categoryId')?.value"
+        (selectedChange)="productForm.get('categoryId')?.setValue($event)">
+      </app-category-dropdown>
     </div>
 
     <div class="form-group">

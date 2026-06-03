@@ -15,7 +15,7 @@
     </div>
     <div class="product-info">
       <h1>{{ product.name }}</h1>
-      <span class="category-badge" *ngIf="product.category">{{ product.category }}</span>
+      <span class="category-badge" *ngIf="product.category">{{ product.category.name || product.category }}</span>
       <p class="description">{{ product.description }}</p>
       <div class="price-stock">
         <span class="price">{{ product.price | currencyMad }}</span>

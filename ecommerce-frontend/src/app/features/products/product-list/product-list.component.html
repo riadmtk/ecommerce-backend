@@ -3,7 +3,13 @@
   <div class="header-section">
     <h1>Catalogue Produits</h1>
     
-    <div class="search-container">
+    <div class="search-container" style="display: flex; gap: 15px; align-items: center; justify-content: flex-end;">
+       <div style="width: 250px;">
+         <app-category-dropdown 
+           [categories]="categoryTree" 
+           (selectedChange)="onCategoryChange({ target: { value: $event } })">
+         </app-category-dropdown>
+       </div>
        <app-search-bar></app-search-bar>
     </div>
   </div>
@@ -22,7 +28,7 @@
       
       <div class="product-info">
         <h3>{{ product.name }}</h3>
-        <p class="category" *ngIf="product.category">{{ product.category }}</p>
+        <p class="category" *ngIf="product.category">{{ product.category.name || product.category }}</p>
         <p class="price">{{ product.price | currencyMad }}</p>
         <p class="stock" [class.out-of-stock]="product.stockQuantity === 0">
           {{ product.stockQuantity > 0 ? product.stockQuantity + ' en stock' : 'Rupture de stock' }}

@@ -14,12 +14,12 @@ public class Product {
     private UUID id;
     private String name;
     private String description;
-    private String category;
+
+    private UUID categoryId;
+    private String categoryName;
+
     private BigDecimal price;
-
     private List<String> imageUrls;
-
     private int stockQuantity;
     private boolean active;
-
 }

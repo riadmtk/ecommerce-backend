@@ -21,13 +21,19 @@ public class ProductEventMessage {
     private int stockQuantity;
     private boolean active;
 
-    private String category;
+    // 🚀 NEW: Flat fields for the Category
+    private UUID categoryId;
+    private String categoryName;
+
     private List<String> imageUrls;
 
     public static ProductEventMessage fromProduct(String eventType, Product product) {
-        // Extract just the string URLs from the Domain Image objects
         List<String> extractedUrls = product.getImages() != null ?
                 product.getImages().stream().map(ProductImage::getImageUrl).toList() : new ArrayList<>();
+
+        // Safely extract category data
+        UUID catId = product.getCategory() != null ? product.getCategory().getId() : null;
+        String catName = product.getCategory() != null ? product.getCategory().getName() : null;
 
         return ProductEventMessage.builder()
                 .eventType(eventType)
@@ -37,8 +43,9 @@ public class ProductEventMessage {
                 .price(product.getPrice())
                 .stockQuantity(product.getStockQuantity())
                 .active(product.isActive())
-                .category(product.getCategory()) // ← Sent to Kafka
-                .imageUrls(extractedUrls)        // ← Sent to Kafka
+                .categoryId(catId)       // ← Send ID
+                .categoryName(catName)   // ← Send Name
+                .imageUrls(extractedUrls)
                 .build();
     }
 }

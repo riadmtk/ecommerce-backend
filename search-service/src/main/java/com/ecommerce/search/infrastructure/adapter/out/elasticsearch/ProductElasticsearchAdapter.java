@@ -31,7 +31,8 @@ public class ProductElasticsearchAdapter implements ProductSearchPort {
                 .price(product.getPrice())
                 .stockQuantity(product.getStockQuantity())
                 .active(product.isActive())
-                .category(product.getCategory())
+                .categoryId(product.getCategoryId())     // ← Map ID
+                .categoryName(product.getCategoryName()) // ← Map Name
                 .imageUrls(product.getImageUrls())
                 .build();
 
@@ -45,8 +46,6 @@ public class ProductElasticsearchAdapter implements ProductSearchPort {
 
     @Override
     public List<Product> searchByName(String query) {
-
-        // 🚀 Call the new Multi-Match query!
         return repository.searchProductsWithMultiMatch(query)
                 .stream()
                 .map(doc -> Product.builder()
@@ -56,7 +55,8 @@ public class ProductElasticsearchAdapter implements ProductSearchPort {
                         .price(doc.getPrice())
                         .stockQuantity(doc.getStockQuantity())
                         .active(doc.isActive())
-                        .category(doc.getCategory())
+                        .categoryId(doc.getCategoryId())     // ← Map ID
+                        .categoryName(doc.getCategoryName()) // ← Map Name
                         .imageUrls(doc.getImageUrls())
                         .build())
                 .collect(Collectors.toList());

@@ -1,7 +1,9 @@
 package com.ecommerce.product.infrastructure.adapter.out.persistence.mapper;
 
+import com.ecommerce.product.domain.model.Category;
 import com.ecommerce.product.domain.model.Product;
 import com.ecommerce.product.domain.model.ProductImage;
+import com.ecommerce.product.infrastructure.adapter.out.persistence.entity.CategoryEntity;
 import com.ecommerce.product.infrastructure.adapter.out.persistence.entity.ProductEntity;
 import com.ecommerce.product.infrastructure.adapter.out.persistence.entity.ProductImageEntity;
 import org.springframework.stereotype.Component;
@@ -16,20 +18,30 @@ public class ProductPersistenceMapper {
     public ProductEntity toEntity(Product product) {
         if (product == null) return null;
 
+        // Map Domain Category to Entity Category
+        CategoryEntity categoryEntity = null;
+        if (product.getCategory() != null) {
+            categoryEntity = CategoryEntity.builder()
+                    .id(product.getCategory().getId())
+                    .name(product.getCategory().getName())
+                    .description(product.getCategory().getDescription())
+                    // Note: We usually don't map the parent entity here unless explicitly saving the hierarchy
+                    .build();
+        }
+
         ProductEntity entity = ProductEntity.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .stockQuantity(product.getStockQuantity())
-                .category(product.getCategory())
+                .category(categoryEntity) // ← Map the new entity
                 .active(product.isActive())
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
-                .images(new ArrayList<>()) // Initialize empty list
+                .images(new ArrayList<>())
                 .build();
 
-        // Safely map domain images to JPA entities using the helper method
         if (product.getImages() != null) {
             for (ProductImage img : product.getImages()) {
                 ProductImageEntity imgEntity = ProductImageEntity.builder()
@@ -38,7 +50,7 @@ public class ProductPersistenceMapper {
                         .displayOrder(img.getDisplayOrder())
                         .isPrimary(img.isPrimary())
                         .build();
-                entity.addImage(imgEntity); // ← Binds the Foreign Key automatically!
+                entity.addImage(imgEntity);
             }
         }
 
@@ -47,6 +59,17 @@ public class ProductPersistenceMapper {
 
     public Product toDomain(ProductEntity entity) {
         if (entity == null) return null;
+
+        // Map Entity Category back to Domain Category
+        Category domainCategory = null;
+        if (entity.getCategory() != null) {
+            domainCategory = Category.builder()
+                    .id(entity.getCategory().getId())
+                    .name(entity.getCategory().getName())
+                    .description(entity.getCategory().getDescription())
+                    .parentId(entity.getCategory().getParent() != null ? entity.getCategory().getParent().getId() : null)
+                    .build();
+        }
 
         List<ProductImage> domainImages = entity.getImages() != null ?
                 entity.getImages().stream().map(img -> ProductImage.builder()
@@ -63,7 +86,7 @@ public class ProductPersistenceMapper {
                 .description(entity.getDescription())
                 .price(entity.getPrice())
                 .stockQuantity(entity.getStockQuantity())
-                .category(entity.getCategory())
+                .category(domainCategory) // ← Map the new domain object
                 .active(entity.isActive())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())

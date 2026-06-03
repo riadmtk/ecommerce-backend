@@ -22,8 +22,6 @@ public class ProductEventConsumer {
 
         log.info("🔔 KAFKA MESSAGE RECEIVED IN SEARCH SERVICE: {}", event);
 
-        // --- 1. ADD THIS SAFEGUARD ---
-        // This prevents the infinite crash loop if Kafka sends a malformed message
         if (event.getId() == null) {
             log.error("❌ Received ProductEvent with null ID. Dropping message.");
             return;
@@ -39,8 +37,9 @@ public class ProductEventConsumer {
                     .price(event.getPrice())
                     .stockQuantity(event.getStockQuantity())
                     .active(event.isActive())
-                    .category(event.getCategory())     // ← 2. Map the new category
-                    .imageUrls(event.getImageUrls())   // ← 3. Map the new image array
+                    .categoryId(event.getCategoryId())     // ← Map ID
+                    .categoryName(event.getCategoryName()) // ← Map Name
+                    .imageUrls(event.getImageUrls())
                     .build();
 
             syncUseCase.syncProduct(product);

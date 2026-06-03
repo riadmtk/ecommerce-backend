@@ -22,6 +22,8 @@ public class ProductEvent {
     private int stockQuantity;
     private boolean active;
 
-    private String category;
+    private UUID categoryId;
+    private String categoryName;
+
     private List<String> imageUrls;
 }

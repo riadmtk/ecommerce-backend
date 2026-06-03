@@ -6,6 +6,7 @@ export const environment = {
     auth: 'http://localhost:8080/api/auth',
     users: 'http://localhost:8080/api/users',
     products: 'http://localhost:8080/api/v1/products',
+    categories: 'http://localhost:8080/api/v1/categories',
     orders: 'http://localhost:8080/api/orders',
     payments: 'http://localhost:8080/api/payments',
     search: 'http://localhost:8080/api/v1/search',

@@ -69,23 +69,19 @@
       color: #64748b;
     }
 
-    .btn-action {
-      padding: 6px 12px;
-      border: none;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 500;
+    .action-icon {
       cursor: pointer;
-      transition: background 0.2s;
-
-      &.view {
-        background: #eff6ff;
-        color: #1d4ed8;
-
-        &:hover {
-          background: #dbeafe;
-        }
+      opacity: 0.8;
+      transition: opacity 0.2s, transform 0.1s;
+      
+      &:hover {
+        opacity: 1;
+        transform: scale(1.1);
       }
+      
+      &.edit { color: #3b82f6; }
+      &.deactivate { color: #f97316; }
+      &.delete { color: #ef4444; }
     }
   }
 
