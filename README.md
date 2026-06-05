@@ -4,8 +4,6 @@ Backend de l'application E-Commerce Modulaire basé sur une architecture
 **Microservices**, paradigme **Headless & Composable Commerce**,
 avec Architecture Hexagonale (Ports & Adapters) par service.
 
-> ⚠️ Ce projet est en cours de développement.
-> Les microservices seront ajoutés progressivement au fil des sprints.
 
 ---
 
@@ -22,21 +20,21 @@ applications Angular (Front Office & Back Office).
 - **Auth** — JWT / Spring Security
 - **BDD** — PostgreSQL (schéma isolé par service)
 - **Recherche** — ElasticSearch
-- **Conteneurisation** — Docker + Kubernetes
+- **Conteneurisation** — Docker
 
 ## 📦 Microservices Prévus
 
 | **Service**          | **Port prévu** | **Statut** | **Description**             |
-| -------------------- | -------------- |-----------| ----------------------------|
-| API Gateway          | 8080           | 🔜 À venir | Point d'entrée unique       |
+| -------------------- | -------------- |----------- | ----------------------------|
+| API Gateway          | 8080           | ✅ Términé | Point d'entrée unique       |
 | User Service         | 8081           | ✅ Términé | Auth, profil, comptes       |
 | Product Service      | 8082           | ✅ Términé | Catalogue, stock            |
-| Search Service       | 8083           | 🔜 À venir | Recherche full-text         |
-| Cart Service         | 8084           | 🔜 À venir | Panier, checkout            |
-| Order Service        | 8085           | 🔜 À venir | Commandes                   |
-| Payment Service      | 8086           | 🔜 À venir | Paiement Stripe/PayPal      |
-| Notification Service | 8087           | 🔜 À venir | SMS/Email                   |
-| Wishlist Service     | 8088           | 🔜 À venir | La liste des produits aimés |
+| Search Service       | 8083           | ✅ Términé | Recherche full-text         |
+| Cart Service         | 8084           | ✅ Términé | Panier, checkout            |
+| Order Service        | 8085           | ✅ Términé | Commandes                   |
+| Payment Service      | 8086           | ✅ Términé | Paiement Stripe/PayPal      |
+| Notification Service | 8087           | ✅ Términé | SMS/Email                   |
+| Wishlist Service     | 8088           | ✅ Términé | La liste des produits aimés |
 
 ## ⚙️ Prérequis
 
@@ -150,15 +148,3 @@ Exemples :
 - `ESP-42: init payment service structure`
 - `ESP-42: add StripeAdapter implementation`
 - `ESP-42: add webhook signature verification`
-
-## 🔗 Liens
-
-- 📋 **Jira** : [Lien vers le projet Jira]
-- 📖 **Confluence** : [Lien vers la documentation Confluence]
-- 🎨 **Front Office** : [Lien vers le repo frontend]
-
-
-## 📅 Avancement
-
-Le développement des microservices suivra les tickets Jira du projet.
-Chaque service sera documenté ici au fur et à mesure de son implémentation.
