@@ -1,4 +1,4 @@
-# 🛒 E-Commerce Backend — Microservices
+# 🛒 Composable commerce — Microservices
 
 Backend de l'application E-Commerce Modulaire basé sur une architecture
 **Microservices**, paradigme **Headless & Composable Commerce**,
