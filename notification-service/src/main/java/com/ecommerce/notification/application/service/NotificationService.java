@@ -2,10 +2,7 @@ package com.ecommerce.notification.application.service;
 
 import com.ecommerce.notification.domain.model.Notification;
 import com.ecommerce.notification.domain.model.NotificationType;
-import com.ecommerce.notification.domain.port.in.SendAccountWelcomeUseCase;
-import com.ecommerce.notification.domain.port.in.SendOrderConfirmationUseCase;
-import com.ecommerce.notification.domain.port.in.SendPasswordResetUseCase;
-import com.ecommerce.notification.domain.port.in.SendRestockAlertUseCase;
+import com.ecommerce.notification.domain.port.in.*;
 import com.ecommerce.notification.domain.port.out.EmailPort;
 import com.ecommerce.notification.domain.port.out.NotificationEventPort;
 import com.ecommerce.notification.domain.port.out.NotificationRepositoryPort;
@@ -19,7 +16,8 @@ public class NotificationService implements
         SendOrderConfirmationUseCase,
         SendAccountWelcomeUseCase,
         SendPasswordResetUseCase,
-        SendRestockAlertUseCase {
+        SendRestockAlertUseCase,
+        SendEmailVerificationUseCase {
 
     private final EmailPort emailPort;
     private final SmsPort smsPort;
@@ -117,6 +115,27 @@ public class NotificationService implements
             repositoryPort.save(notification);
             eventPort.publishNotificationSentEvent(notification);
 
+        } catch (Exception e) {
+            notification.markAsFailed(e.getMessage());
+            repositoryPort.save(notification);
+            eventPort.publishNotificationFailedEvent(notification);
+        }
+    }
+
+    @Override
+    public void sendVerificationCode(String email, String code) {
+        String userId = "verification-" + email; // ou un ID temporaire
+        Notification notification = new Notification(userId, email, NotificationType.EMAIL_VERIFICATION);
+        repositoryPort.save(notification);
+
+        try {
+            String subject = "Vérification de votre adresse email";
+            String body = "Bonjour,\n\nMerci de confirmer votre adresse email avec le code suivant :\n\n" + code + "\n\nCe code expire dans 15 minutes.\n\nCordialement,\nL'équipe E-commerce";
+            emailPort.sendEmail(email, subject, body);
+
+            notification.markAsSent();
+            repositoryPort.save(notification);
+            eventPort.publishNotificationSentEvent(notification);
         } catch (Exception e) {
             notification.markAsFailed(e.getMessage());
             repositoryPort.save(notification);

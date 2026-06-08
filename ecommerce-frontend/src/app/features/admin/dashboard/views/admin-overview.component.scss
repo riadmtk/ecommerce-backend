@@ -59,6 +59,7 @@
       .kpi-info {
         display: flex;
         flex-direction: column;
+        min-width: 0;
 
         .label {
           font-size: 13px;
@@ -74,6 +75,9 @@
           font-weight: 800;
           color: #0f172a;
           letter-spacing: -0.5px;
+          min-width: 0;
+          overflow-wrap: anywhere;
+          word-break: break-word;
         }
       }
     }

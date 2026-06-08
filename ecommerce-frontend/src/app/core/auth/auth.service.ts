@@ -118,4 +118,12 @@ export class AuthService {
     if (!payload?.exp) return true;
     return Date.now() >= payload.exp * 1000;
   }
+
+  verifyEmail(email: string, code: string): Observable<any> {
+    return this.http.post(`${environment.services.auth}/verify`, { email, code });
+  }
+
+  resendVerificationCode(email: string): Observable<any> {
+    return this.http.post(`${environment.services.auth}/resend-code`, { email });
+  }
 }

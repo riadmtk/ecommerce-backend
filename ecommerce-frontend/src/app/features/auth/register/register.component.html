@@ -55,3 +55,32 @@
     </form>
   </div>
 </div>
+
+<div class="modal-overlay" *ngIf="showVerificationModal">
+  <div class="modal-content">
+    <button type="button" class="modal-close" (click)="closeModal()" aria-label="Fermer">&times;</button>
+    <h3>Vérification de votre email</h3>
+    <p>Un code de vérification a été envoyé à <strong>{{ verificationEmail }}</strong></p>
+
+    <form [formGroup]="verificationForm" (ngSubmit)="verifyCode()">
+      <div class="form-group">
+        <label>Code de vérification (6 chiffres)</label>
+        <input type="text" formControlName="code" placeholder="Ex: 123456" />
+        <span class="error-msg" *ngIf="verificationForm.get('code')?.invalid && verificationForm.get('code')?.touched">
+          Le code doit comporter 6 chiffres
+        </span>
+      </div>
+
+      <div class="error-banner" *ngIf="verificationError">{{ verificationError }}</div>
+
+      <button type="submit" [disabled]="verificationForm.invalid || verificationLoading">
+        {{ verificationLoading ? 'Vérification...' : 'Vérifier' }}
+      </button>
+
+      <p class="resend-link">
+        Vous n'avez pas reçu le code ?
+        <a href="javascript:void(0)" (click)="resendCode()">Renvoyer le code</a>
+      </p>
+    </form>
+  </div>
+</div>

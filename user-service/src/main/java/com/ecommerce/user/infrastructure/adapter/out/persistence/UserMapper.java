@@ -20,6 +20,9 @@ public class UserMapper {
                 .updatedAt(entity.getUpdatedAt())
                 .resetToken(entity.getResetToken())
                 .resetTokenExpiry(entity.getResetTokenExpiry())
+                .enabled(entity.isEnabled())
+                .verificationCode(entity.getVerificationCode())
+                .verificationCodeExpiry(entity.getVerificationCodeExpiry())
                 .build();
     }
 
@@ -36,6 +39,9 @@ public class UserMapper {
                 .updatedAt(user.getUpdatedAt())
                 .resetToken(user.getResetToken())
                 .resetTokenExpiry(user.getResetTokenExpiry())
+                .enabled(user.isEnabled())
+                .verificationCode(user.getVerificationCode())
+                .verificationCodeExpiry(user.getVerificationCodeExpiry())
                 .build();
     }
 }

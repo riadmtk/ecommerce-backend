@@ -51,6 +51,14 @@ public class UserEntity {
     @Column(name = "reset_token_expiry")
     private LocalDateTime resetTokenExpiry;
 
+    @Builder.Default
+    private boolean enabled = false;   // ← false = non vérifié
+
+    @Column(length = 6)
+    private String verificationCode;   // code à 6 chiffres
+
+    private LocalDateTime verificationCodeExpiry;
+
     @PrePersist
     protected void onCreate() {
         if (id == null) {

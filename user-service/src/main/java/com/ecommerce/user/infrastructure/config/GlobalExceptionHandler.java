@@ -2,6 +2,7 @@ package com.ecommerce.user.infrastructure.config;
 
 import com.ecommerce.user.domain.exception.EmailAlreadyExistsException;
 import com.ecommerce.user.domain.exception.InvalidCredentialsException;
+import com.ecommerce.user.domain.exception.InvalidVerificationCodeException;
 import com.ecommerce.user.domain.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,6 +73,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 new ErrorResponse(500, "Internal Server Error",
                         "Une erreur inattendue s'est produite",
+                        LocalDateTime.now(), request.getRequestURI()));
+    }
+
+    @ExceptionHandler(InvalidVerificationCodeException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidVerificationCode(
+            InvalidVerificationCodeException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ErrorResponse(400, "Bad Request", ex.getMessage(),
                         LocalDateTime.now(), request.getRequestURI()));
     }
 }

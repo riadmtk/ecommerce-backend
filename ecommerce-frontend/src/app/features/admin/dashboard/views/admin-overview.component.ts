@@ -4,11 +4,12 @@ import { OrderService } from '../../../../core/services/order.service';
 import { UserService } from '../../../../core/services/user.service';
 import { ProductService } from '../../../../core/services/product.service';
 import { forkJoin } from 'rxjs';
+import { CurrencyMadPipe } from '../../../../shared/pipes/currency-mad.pipe';
 
 @Component({
   selector: 'app-admin-overview',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CurrencyMadPipe],
   templateUrl: './admin-overview.component.html',
   styleUrls: ['./admin-overview.component.scss']
 })

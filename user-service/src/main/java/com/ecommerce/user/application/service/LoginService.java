@@ -1,5 +1,6 @@
 package com.ecommerce.user.application.service;
 
+import com.ecommerce.user.domain.exception.EmailNotVerifiedException;
 import com.ecommerce.user.domain.exception.InvalidCredentialsException;
 import com.ecommerce.user.domain.model.User;
 import com.ecommerce.user.domain.port.in.LoginUseCase;
@@ -21,6 +22,10 @@ public class LoginService implements LoginUseCase {
     public LoginResult login(LoginCommand command) {
         User user = userRepository.findByEmail(command.email())
                 .orElseThrow(InvalidCredentialsException::new);
+
+        if (!user.isEnabled()) {
+            throw new EmailNotVerifiedException();
+        }
 
         if (!passwordEncoder.matches(command.password(), user.getPassword())) {
             throw new InvalidCredentialsException();

@@ -34,3 +34,7 @@ external:
     enabled: false   # true pour tester l'envoi vers GCP
     bootstrap-servers: 136.115.254.39:9092
     topic: ecommerce-events
+
+notification:
+  service:
+    url: http://localhost:8087   # l'URL de votre notification-service

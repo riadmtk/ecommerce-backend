@@ -1,7 +1,9 @@
 package com.ecommerce.notification.infrastructure.adapter.in.web;
 
+import com.ecommerce.notification.domain.port.in.SendEmailVerificationUseCase;
 import com.ecommerce.notification.domain.port.in.SendOrderConfirmationUseCase;
 import com.ecommerce.notification.infrastructure.adapter.in.web.dto.NotificationRequest;
+import com.ecommerce.notification.infrastructure.adapter.in.web.dto.VerificationCodeRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ public class NotificationController {
 
     // On injecte l'interface pure du Use Case
     private final SendOrderConfirmationUseCase sendOrderConfirmationUseCase;
+    private final SendEmailVerificationUseCase sendEmailVerificationUseCase;
 
     @PostMapping("/send-confirmation")
     public ResponseEntity<String> sendManualConfirmation(@RequestBody @Valid NotificationRequest request) {
@@ -30,5 +33,12 @@ public class NotificationController {
         );
 
         return ResponseEntity.ok("Notification process triggered successfully.");
+    }
+
+    @PostMapping("/send-verification")
+    public ResponseEntity<String> sendVerificationCode(@RequestBody @Valid VerificationCodeRequest request) {
+        log.info("🌐 Received REST request to send verification code to: {}", request.email());
+        sendEmailVerificationUseCase.sendVerificationCode(request.email(), request.code());
+        return ResponseEntity.ok("Verification code sent successfully.");
     }
 }

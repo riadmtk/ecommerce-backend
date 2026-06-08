@@ -1,0 +1,23 @@
+<div class="verify-container">
+  <div class="verify-card">
+    <h2>Vérification de votre email</h2>
+    <p>Un code de vérification a été envoyé à <strong>{{ email }}</strong></p>
+    <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>Code de vérification</label>
+        <input type="text" formControlName="code" placeholder="Ex: 123456" />
+        <span class="error-msg" *ngIf="verifyForm.get('code')?.invalid && verifyForm.get('code')?.touched">
+          Le code est requis (6 chiffres)
+        </span>
+      </div>
+      <div class="error-banner" *ngIf="errorMessage">{{ errorMessage }}</div>
+      <button type="submit" [disabled]="verifyForm.invalid || isLoading">
+        {{ isLoading ? 'Vérification...' : 'Vérifier' }}
+      </button>
+      <p class="resend">
+        Vous n'avez pas reçu le code ?
+        <a href="javascript:void(0)" (click)="resendCode()">Renvoyer le code</a>
+      </p>
+    </form>
+  </div>
+</div>

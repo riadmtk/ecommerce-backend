@@ -30,7 +30,7 @@
         <div class="kpi-icon"><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
         <div class="kpi-info">
           <span class="label">Revenu</span>
-          <span class="value">{{ totalRevenue | currency:'MAD':'symbol' }}</span>
+          <span class="value">{{ totalRevenue | currencyMad }}</span>
         </div>
       </div>
 
@@ -54,7 +54,7 @@
             <div class="timeline-dot" [class.latest]="first"></div>
             <div class="timeline-content">
               <p class="title">Commande #{{ order.id?.substring(0, 8) }} <span class="status-badge" [ngClass]="'status-' + order.status.toLowerCase().replace('_', '-')">{{ order.status }}</span></p>
-              <p class="amount">Total: {{ order.totalAmount | currency:'MAD':'symbol' }}</p>
+              <p class="amount">Total: {{ order.totalAmount | currencyMad }}</p>
               <p class="time">{{ order.createdAt | date:'short' }}</p>
             </div>
           </div>
