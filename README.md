@@ -146,5 +146,5 @@ ESP-XX: description courte de ce qui a été fait
 
 Exemples :
 - `ESP-42: init payment service structure`
-- `ESP-42: add StripeAdapter implementation`
+- `ESP-42: add Stripe Adapter implementation`
 - `ESP-42: add webhook signature verification`
