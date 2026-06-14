@@ -51,6 +51,7 @@ public class UserEntity {
     @Column(name = "reset_token_expiry")
     private LocalDateTime resetTokenExpiry;
 
+    @Column(nullable = false)
     @Builder.Default
     private boolean enabled = false;   // ← false = non vérifié
 

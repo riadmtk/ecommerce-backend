@@ -1,43 +1,89 @@
-<nav class="navbar">
-  <div class="navbar-brand">
-    <a routerLink="/products">Comcom</a>
-  </div>
-
-  <div class="navbar-nav">
-    <a routerLink="/products" routerLinkActive="active">Catalogue</a>
-    <ng-container *ngIf="authService.isLoggedIn()">
-      <a routerLink="/orders" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Mes Commandes</a>
-    </ng-container>
-  </div>
-
-  <div class="navbar-actions">
-    <!-- Icon Links -->
-    <div class="icon-links">
-      <a routerLink="/wishlist" class="icon-btn" title="Mes favoris">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-        </svg>
-      </a>
-      <a routerLink="/cart" class="icon-btn" title="Mon panier">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-      </a>
-      <a *ngIf="authService.isLoggedIn()" routerLink="/profile" class="icon-btn" title="Mon Profil">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      </a>
+<header class="navbar-wrapper">
+  <!-- Top Row -->
+  <div class="navbar-top">
+    <div class="navbar-brand">
+      <a routerLink="/products">Comcom</a>
     </div>
 
-    <!-- Auth Buttons -->
-    <ng-container *ngIf="!authService.isLoggedIn()">
-      <a routerLink="/auth/login" class="btn-text">Connexion</a>
-      <a routerLink="/auth/register" class="btn-primary">S'inscrire</a>
-    </ng-container>
+    <div class="navbar-search-wrapper">
+      <app-search-bar></app-search-bar>
+    </div>
 
-    <ng-container *ngIf="authService.isLoggedIn()">
-      <button (click)="logout()" class="btn-secondary">Déconnexion</button>
-    </ng-container>
+    <div class="navbar-actions">
+      <!-- Icon Links -->
+      <div class="icon-links">
+        <a routerLink="/wishlist" class="icon-btn" title="Mes favoris">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </a>
+        <button class="icon-btn cart-btn" (click)="toggleCartDrawer()" title="Mon panier">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+        </button>
+        <a *ngIf="authService.isLoggedIn()" routerLink="/profile" class="icon-btn" title="Mon Profil">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </a>
+      </div>
+
+      <!-- Auth Buttons -->
+      <ng-container *ngIf="!authService.isLoggedIn()">
+        <a routerLink="/auth/login" class="btn-text">Connexion</a>
+        <a routerLink="/auth/register" class="btn-primary">S'inscrire</a>
+      </ng-container>
+
+      <ng-container *ngIf="authService.isLoggedIn()">
+        <button (click)="logout()" class="btn-secondary">Déconnexion</button>
+      </ng-container>
+    </div>
   </div>
-</nav>
+
+  <!-- Bottom Row -->
+  <nav class="navbar-bottom">
+    <div class="navbar-nav">
+      <a routerLink="/products" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Accueil</a>
+      <a *ngIf="authService.isLoggedIn()" routerLink="/orders" routerLinkActive="active">Mes Commandes</a>
+      <a routerLink="/about">About us</a>
+      <a routerLink="/contact">Contact</a>
+    </div>
+  </nav>
+
+  <!-- Cart Sidebar Drawer -->
+  <div class="cart-drawer-overlay" *ngIf="isCartDrawerOpen" (click)="closeCartDrawer()"></div>
+  <div class="cart-drawer" [class.open]="isCartDrawerOpen">
+    <div class="drawer-header">
+      <h3>Mon Panier ({{ cartItemCount }})</h3>
+      <button class="close-btn" (click)="closeCartDrawer()">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    
+    <div class="drawer-body">
+      <div *ngIf="cartItemsDetailed.length === 0" class="empty-cart">
+        Votre panier est vide.
+      </div>
+      <div class="cart-items" *ngIf="cartItemsDetailed.length > 0">
+        <div class="cart-item" *ngFor="let item of cartItemsDetailed">
+          <img [src]="item.imageUrl || 'assets/placeholder.png'" [alt]="item.productName">
+          <div class="item-details">
+            <h4>{{ item.productName }}</h4>
+            <p class="price">{{ item.unitPrice | currencyMad }}</p>
+            <p class="qty">Quantité: {{ item.quantity }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer-footer" *ngIf="cartItemsDetailed.length > 0">
+      <div class="total-row">
+        <span>Total</span>
+        <strong>{{ cartTotal | currencyMad }}</strong>
+      </div>
+      <button class="btn-primary" routerLink="/cart" (click)="closeCartDrawer()">Voir Panier</button>
+    </div>
+  </div>
+</header>

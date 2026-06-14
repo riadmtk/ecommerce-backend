@@ -17,6 +17,8 @@ export class AdminUsersComponent implements OnInit {
   searchTerm: string = '';
   
   selectedUser: User | null = null;
+  selectedUserForRole: User | null = null;
+  newRole: string = 'USER';
   isLoading: boolean = false;
   copiedId: string | null = null;
 
@@ -63,6 +65,35 @@ export class AdminUsersComponent implements OnInit {
 
   closeUserModal() {
     this.selectedUser = null;
+  }
+
+  openRoleModal(user: User) {
+    this.selectedUserForRole = user;
+    this.newRole = user.role || 'USER';
+  }
+
+  closeRoleModal() {
+    this.selectedUserForRole = null;
+  }
+
+  saveRole() {
+    if (!this.selectedUserForRole || !this.selectedUserForRole.id) return;
+    
+    const userId = this.selectedUserForRole.id;
+    this.isLoading = true;
+    
+    this.userService.updateRole(userId, this.newRole).subscribe({
+      next: () => {
+        this.closeRoleModal();
+        this.loadUsers(); // Refresh the list
+      },
+      error: (err) => {
+        console.error('Error updating role:', err);
+        // Fallback in case response is empty/plain text and fails JSON parse
+        this.closeRoleModal();
+        this.loadUsers();
+      }
+    });
   }
 
   copyId(id: string) {

@@ -119,7 +119,7 @@ export const routes: Routes = [
     path: 'payment-checkout',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/checkout/checkout.component').then(m => m.CheckoutComponent)
+      import('./features/payment/payment.component').then(m => m.PaymentComponent)
   },
   {
     path: 'payment-success',
@@ -142,6 +142,18 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/payment-paypal-cancel/paypal-cancel.component')
         .then(m => m.PaypalCancelComponent)
+  },
+
+  // Static Pages
+  {
+    path: 'about',
+    loadComponent: () =>
+      import('./features/static/about.component').then(m => m.AboutComponent)
+  },
+  {
+    path: 'contact',
+    loadComponent: () =>
+      import('./features/static/contact.component').then(m => m.ContactComponent)
   },
 
   // Pages légales

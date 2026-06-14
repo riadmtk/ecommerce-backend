@@ -2,7 +2,9 @@
   <input 
     type="text" 
     [(ngModel)]="searchTerm" 
+    (input)="onInput()"
     (keyup.enter)="onSearch()"
+    (focus)="searchTerm.trim() ? showSuggestions = true : null"
     placeholder="Rechercher un produit..." 
     class="search-input"
   />
@@ -12,4 +14,14 @@
       <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
     </svg>
   </button>
+
+  <div class="search-suggestions" *ngIf="showSuggestions">
+    <div class="suggestion-item" *ngFor="let product of suggestions" (mousedown)="selectSuggestion(product)">
+      <img [src]="getProductImage(product)" [alt]="product.name" class="suggestion-img">
+      <div class="suggestion-info">
+        <span class="suggestion-name">{{ product.name }}</span>
+        <span class="suggestion-price">{{ product.price | currencyMad }}</span>
+      </div>
+    </div>
+  </div>
 </div>

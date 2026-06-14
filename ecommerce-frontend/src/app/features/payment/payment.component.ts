@@ -11,13 +11,13 @@ import { environment } from '../../../environments/environment';
 import { CurrencyMadPipe } from '../../shared/pipes/currency-mad.pipe';
 
 @Component({
-  selector: 'app-checkout',
+  selector: 'app-payment',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, CurrencyMadPipe],
-  templateUrl: './checkout.component.html',
-  styleUrls: ['./checkout.component.scss']
+  templateUrl: './payment.component.html',
+  styleUrls: ['./payment.component.scss']
 })
-export class CheckoutComponent implements OnInit, OnDestroy {
+export class PaymentComponent implements OnInit, OnDestroy {
 
   order: Order | null = null;
   payment: PaymentCreatedResponse | null = null;

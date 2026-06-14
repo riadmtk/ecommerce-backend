@@ -33,9 +33,9 @@ export class CheckoutComponent {
     this.errorMessage = '';
 
     this.orderService.createOrder(this.shippingAddress).subscribe({
-      next: () => {
-        // La commande a été créée, le panier est vidé par le backend
-        this.router.navigate(['/orders']);
+      next: (order) => {
+        // La commande a été créée, naviguer vers le paiement
+        this.router.navigate(['/payment-checkout'], { queryParams: { orderId: order.id } });
       },
       error: (err) => {
         console.error('Erreur création commande', err);

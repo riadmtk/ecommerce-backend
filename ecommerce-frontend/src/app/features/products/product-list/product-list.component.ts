@@ -13,7 +13,7 @@ import { CategoryDropdownComponent } from '../../../shared/components/category-d
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, CurrencyMadPipe, SearchBarComponent, CategoryDropdownComponent], 
+  imports: [CommonModule, RouterModule, CurrencyMadPipe], 
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss']
 })
@@ -23,6 +23,12 @@ export class ProductListComponent implements OnInit {
   categoryTree: CategoryNode[] = [];
   isLoading = true;
   errorMessage = '';
+
+  // View Options
+  viewMode: 'grid' | 'large' | 'list' = 'grid';
+
+  // Sidebar Accordion State
+  expandedNodes: Set<string> = new Set();
 
   constructor(
     private productService: ProductService,
@@ -61,13 +67,27 @@ export class ProductListComponent implements OnInit {
     });
   }
 
-  onCategoryChange(event: any): void {
-    const selectedCategoryId = event.target.value;
-    if (!selectedCategoryId) {
+  onCategoryChange(categoryId: string | undefined): void {
+    if (!categoryId) {
       this.products = [...this.allProducts];
     } else {
-      this.products = this.allProducts.filter(p => p.categoryId === selectedCategoryId || (p.category && p.category.id === selectedCategoryId) || p.category === selectedCategoryId);
+      this.products = this.allProducts.filter(p => p.categoryId === categoryId || (p.category && p.category.id === categoryId) || p.category === categoryId);
     }
+    this.cdr.detectChanges();
+  }
+
+  toggleNode(nodeId: string, event: Event): void {
+    event.stopPropagation();
+    if (this.expandedNodes.has(nodeId)) {
+      this.expandedNodes.delete(nodeId);
+    } else {
+      this.expandedNodes.add(nodeId);
+    }
+    this.cdr.detectChanges();
+  }
+
+  setViewMode(mode: 'grid' | 'large' | 'list'): void {
+    this.viewMode = mode;
     this.cdr.detectChanges();
   }
 

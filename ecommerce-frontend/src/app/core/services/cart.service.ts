@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, of } from 'rxjs';
-import { switchMap, map } from 'rxjs/operators';
+import { Observable, forkJoin, of, BehaviorSubject } from 'rxjs';
+import { switchMap, map, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Cart, CartItem } from '../models/cart.model';
 import { Product } from '../models/product.model';
@@ -12,6 +12,10 @@ export class CartService {
   // 1. FIXED: Now pulls dynamically from the Gateway URL in environment.ts!
   private baseUrl = `${environment.services.cart}/my-cart`;
 
+  // Global Cart State for UI Badges
+  private cartUpdatedSubject = new BehaviorSubject<void>(undefined);
+  cartUpdated$ = this.cartUpdatedSubject.asObservable();
+
   constructor(private http: HttpClient) {}
 
   getCart(): Observable<Cart> {
@@ -19,15 +23,21 @@ export class CartService {
   }
 
   addItem(productId: string, quantity: number = 1): Observable<Cart> {
-    return this.http.post<Cart>(`${this.baseUrl}/items`, { productId, quantity });
+    return this.http.post<Cart>(`${this.baseUrl}/items`, { productId, quantity }).pipe(
+      tap(() => this.cartUpdatedSubject.next())
+    );
   }
 
   removeItem(productId: string): Observable<Cart> {
-    return this.http.delete<Cart>(`${this.baseUrl}/items/${productId}`);
+    return this.http.delete<Cart>(`${this.baseUrl}/items/${productId}`).pipe(
+      tap(() => this.cartUpdatedSubject.next())
+    );
   }
 
   clearCart(): Observable<void> {
-    return this.http.delete<void>(this.baseUrl);
+    return this.http.delete<void>(this.baseUrl).pipe(
+      tap(() => this.cartUpdatedSubject.next())
+    );
   }
 
   // Récupère le panier enrichi avec les détails des produits
@@ -65,6 +75,8 @@ export class CartService {
   }
 
   updateItemQuantity(productId: string, quantity: number): Observable<Cart> {
-    return this.http.put<Cart>(`${this.baseUrl}/items/${productId}`, { quantity });
+    return this.http.put<Cart>(`${this.baseUrl}/items/${productId}`, { quantity }).pipe(
+      tap(() => this.cartUpdatedSubject.next())
+    );
   }
 }

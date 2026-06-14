@@ -7,6 +7,9 @@ import com.ecommerce.user.domain.port.in.RequestPasswordResetUseCase;
 import com.ecommerce.user.domain.port.in.ExecutePasswordResetUseCase;
 import com.ecommerce.user.infrastructure.adapter.in.web.dto.UpdateProfileRequest;
 import com.ecommerce.user.infrastructure.adapter.in.web.dto.UserResponse;
+import com.ecommerce.user.infrastructure.adapter.out.persistence.UserJpaRepository;
+import com.ecommerce.user.domain.model.UserRole;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,6 +35,9 @@ public class UserController {
     private final UpdateProfileUseCase updateProfileUseCase;
     private final RequestPasswordResetUseCase requestPasswordResetUseCase;
     private final ExecutePasswordResetUseCase executePasswordResetUseCase;
+
+    // Ajout du repository pour l'approche CQRS (modification directe)
+    private final UserJpaRepository userJpaRepository;
 
     @GetMapping("/me")
     @Operation(summary = "Récupérer le profil de l'utilisateur connecté")
@@ -81,6 +87,32 @@ public class UserController {
     }
 
 
+    @PutMapping("/{id}/role")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Modifier le rôle d'un utilisateur (Admin uniquement)")
+    public ResponseEntity<Void> changeUserRole(
+            @PathVariable UUID id,
+            @RequestBody UpdateRoleRequest request) {
+
+        try {
+            // 1. Convert the String to your Domain Enum
+            UserRole roleEnum = UserRole.valueOf(request.role().toUpperCase());
+
+            // 2. Pass the Enum to the repository
+            int updatedRows = userJpaRepository.updateRoleById(id, roleEnum);
+
+            if (updatedRows == 0) {
+                return ResponseEntity.notFound().build(); // L'utilisateur n'existe pas
+            }
+
+            return ResponseEntity.ok().build();
+
+        } catch (IllegalArgumentException e) {
+            // The role string sent in the request doesn't match any value in UserRole Enum
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/internal/{id}/email")
     @Operation(summary = "Route interne pour récupérer l'email (Inter-services)", hidden = true)
     public ResponseEntity<InternalEmailResponse> getUserEmailInternal(@PathVariable("id") UUID id) {
@@ -106,4 +138,7 @@ public class UserController {
     public record InternalEmailResponse(UUID id, String email) {}
     public record ForgotPasswordRequest(String email) {}
     public record ResetPasswordRequest(String token, String newPassword) {}
+
+    // NOUVEAU : DTO pour la mise à jour du rôle
+    public record UpdateRoleRequest(String role) {}
 }

@@ -25,4 +25,8 @@ export class UserService {
     return this.http.get<User>(`${environment.services.users}/${id}`);
   }
 
+  updateRole(id: string, role: string): Observable<User> {
+    const payload = { role: role };
+    return this.http.put<User>(`${environment.services.users}/${id}/role`, payload);
+  }
 }
