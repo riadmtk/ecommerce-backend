@@ -74,6 +74,7 @@ import { FormsModule } from '@angular/forms';
           font-size: 36px;
           margin: 0 0 16px;
           font-weight: 700;
+          color: var(--color-off-white);
         }
 
         p {

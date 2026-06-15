@@ -33,9 +33,11 @@
           <td>{{ order.totalAmount | currency:'MAD':'symbol' }}</td>
           <td>{{ order.createdAt | date:'short' }}</td>
           <td>
-            <span class="order-status status-{{ order.status.toLowerCase().replace('_', '-') }}" style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase;">
-              {{ order.status }}
-            </span>
+            <select [ngModel]="order.status" (ngModelChange)="updateStatus(order, $event)" 
+                    class="order-status status-select status-{{ order.status.toLowerCase().replace('_', '-') }}" 
+                    style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; border: 1px solid #ccc; cursor: pointer;">
+              <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
+            </select>
           </td>
           <td>
             <ng-container *ngIf="order.status === 'REFUND_REQUESTED'">

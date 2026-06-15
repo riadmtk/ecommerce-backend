@@ -17,11 +17,7 @@
 
   <div class="search-suggestions" *ngIf="showSuggestions">
     <div class="suggestion-item" *ngFor="let product of suggestions" (mousedown)="selectSuggestion(product)">
-      <img [src]="getProductImage(product)" [alt]="product.name" class="suggestion-img">
-      <div class="suggestion-info">
-        <span class="suggestion-name">{{ product.name }}</span>
-        <span class="suggestion-price">{{ product.price | currencyMad }}</span>
-      </div>
+      <span class="suggestion-name">{{ product.name }}</span>
     </div>
   </div>
 </div>

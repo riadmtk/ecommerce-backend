@@ -18,6 +18,7 @@
       <thead>
         <tr>
           <th>ID</th>
+          <th>Image</th>
           <th>Nom</th>
           <th>Prix</th>
           <th>Stock</th>
@@ -30,7 +31,10 @@
             {{ product.id }} 
             <span *ngIf="copiedId === product.id" style="color: #16a34a; font-size: 11px; margin-left: 4px;">(Copié)</span>
           </td>
-          <td>{{ product.name }}</td>
+          <td>
+            <img [src]="getProductImage(product)" [alt]="product.name" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; display: block;">
+          </td>
+          <td style="font-weight: 500;">{{ product.name }}</td>
           <td>{{ product.price | currency:'MAD':'symbol' }}</td>
           <td>
             <span class="stock-badge" [class.out]="product.stockQuantity === 0">{{ product.stockQuantity }}</span>

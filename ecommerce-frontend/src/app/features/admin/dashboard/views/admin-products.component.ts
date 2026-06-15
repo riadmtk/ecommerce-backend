@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ProductService } from '../../../../core/services/product.service';
 import { Product } from '../../../../core/models/product.model';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-products',
@@ -88,5 +89,16 @@ export class AdminProductsComponent implements OnInit {
         this.cdr.detectChanges();
       }, 2000);
     });
+  }
+
+  getProductImage(product: Product): string {
+    if (product.images && product.images.length > 0) {
+      const mainImage = product.images.find(img => img.isPrimary) || product.images[0];
+      return `${environment.apiGatewayUrl}/api/v1/products/images/${mainImage.imageUrl}`;
+    }
+    if (product.imageUrls && product.imageUrls.length > 0) {
+      return `${environment.apiGatewayUrl}/api/v1/products/images/${product.imageUrls[0]}`;
+    }
+    return 'assets/placeholder.png'; 
   }
 }
