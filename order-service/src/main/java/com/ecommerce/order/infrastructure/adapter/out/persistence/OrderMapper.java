@@ -18,6 +18,7 @@ public class OrderMapper {
                 .status(entity.getStatus())
                 .shippingAddress(entity.getShippingAddress())
                 .paymentId(entity.getPaymentId())
+                .refundReason(entity.getRefundReason())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
@@ -41,6 +42,7 @@ public class OrderMapper {
                 .status(order.getStatus())
                 .shippingAddress(order.getShippingAddress())
                 .paymentId(order.getPaymentId())
+                .refundReason(order.getRefundReason())
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
                 .build();

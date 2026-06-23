@@ -21,6 +21,9 @@
           <p>{{ order.items.length }} article(s)</p>
           <p class="order-total">Total : {{ order.totalAmount | currencyMad }}</p>
           <p class="order-date">{{ order.createdAt | date:'dd/MM/yyyy à HH:mm' }}</p>
+          <p *ngIf="order.refundReason" class="refund-reason">
+            <span class="label">Motif remboursement :</span> {{ order.refundReason }}
+          </p>
         </div>
       </div>
       <a [routerLink]="['/orders', order.id]" class="btn-detail">

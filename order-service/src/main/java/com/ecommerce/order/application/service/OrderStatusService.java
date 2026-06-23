@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -40,5 +41,32 @@ public class OrderStatusService implements UpdateOrderStatusUseCase {
             eventPublisher.publishOrderRefunded(updatedOrder);
         }*/
         return updatedOrder;
+    }
+
+    @Transactional
+    public Order requestRefund(UUID orderId, String reason) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
+        if (order.getStatus() != OrderStatus.DELIVERED) {
+            throw new IllegalStateException("Seule une commande livrée peut être remboursée");
+        }
+        // Construire un nouvel Order avec le statut mis à jour et la raison
+        Order updatedOrder = Order.builder()
+                .id(order.getId())
+                .userId(order.getUserId())
+                .items(order.getItems())
+                .totalAmount(order.getTotalAmount())
+                .status(OrderStatus.REFUND_REQUESTED)
+                .shippingAddress(order.getShippingAddress())
+                .paymentId(order.getPaymentId())
+                .refundReason(reason)
+                .createdAt(order.getCreatedAt())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        Order saved = orderRepository.save(updatedOrder);
+        // Publier événement interne
+        eventPublisher.publishOrderStatusUpdated(saved, order.getStatus().name());
+        applicationEventPublisher.publishEvent(saved);
+        return saved;
     }
 }

@@ -7,6 +7,7 @@ import com.ecommerce.payment.domain.port.in.RefundPaymentUseCase;
 import com.ecommerce.payment.infrastructure.adapter.in.web.dto.InitiatePaymentRequest;
 import com.ecommerce.payment.infrastructure.adapter.in.web.dto.PaymentCreatedResponse;
 import com.ecommerce.payment.infrastructure.adapter.in.web.dto.PaymentResponse;
+import com.ecommerce.payment.infrastructure.adapter.in.web.dto.RefundRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -70,8 +71,10 @@ public class PaymentController {
 
     @PostMapping("/{id}/refund")
     @Operation(summary = "Rembourser un paiement")
-    public ResponseEntity<PaymentResponse> refund(@PathVariable UUID id) {
-        Payment payment = refundPaymentUseCase.refund(id);
+    public ResponseEntity<PaymentResponse> refund(
+            @PathVariable UUID id,
+            @Valid @RequestBody RefundRequest request) {   // ← ajout du body
+        Payment payment = refundPaymentUseCase.refund(id, request.reason());
         return ResponseEntity.ok(PaymentResponse.from(payment));
     }
 

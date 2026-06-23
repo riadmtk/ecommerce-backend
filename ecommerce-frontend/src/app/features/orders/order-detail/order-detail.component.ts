@@ -27,6 +27,8 @@ export class OrderDetailComponent implements OnInit {
   isRefunding = false;
   refundSuccess = false;
   statusOptions = ['PENDING', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUND_REQUESTED', 'REFUNDED'];
+  refundReason: string = '';
+  isSubmittingRefund = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -188,12 +190,24 @@ export class OrderDetailComponent implements OnInit {
   }
 
   requestRefund(): void {
-    this.orderService.requestRefund(this.order!.id).subscribe({
-        next: (updatedOrder) => {
-            this.order = updatedOrder;
-            this.cdr.detectChanges();
-        },
-        error: () => this.errorMessage = 'Erreur lors de la demande'
+    if (!this.order) return;
+    if (!this.refundReason || this.refundReason.trim() === '') {
+      alert('Veuillez indiquer un motif pour le remboursement.');
+      return;
+    }
+    this.isSubmittingRefund = true;
+    this.orderService.requestRefund(this.order.id, this.refundReason).subscribe({
+      next: (updatedOrder) => {
+        this.order = updatedOrder;
+        this.refundReason = '';   // vide le champ après succès
+        this.isSubmittingRefund = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.errorMessage = 'Erreur lors de la demande : ' + err.message;
+        this.isSubmittingRefund = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 

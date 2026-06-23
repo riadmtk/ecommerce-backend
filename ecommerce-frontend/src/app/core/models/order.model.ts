@@ -7,6 +7,7 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   shippingAddress?: string;   // ← ajout
+  refundReason?: string;
 }
 
 export interface OrderItem {

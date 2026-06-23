@@ -56,6 +56,7 @@ public class PaymentEventPublisher implements PaymentEventPublisherPort {
         event.put("currency", payment.getCurrency());
         event.put("status", payment.getStatus().name());
         event.put("transactionId", payment.getTransactionId());
+        event.put("refundReason", payment.getRefundReason());
         event.put("occurredAt", LocalDateTime.now().toString());
 
         kafkaTemplate.send(paymentTopic, payment.getOrderId().toString(), event);

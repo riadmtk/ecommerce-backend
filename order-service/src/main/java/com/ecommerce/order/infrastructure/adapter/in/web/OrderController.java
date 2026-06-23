@@ -1,5 +1,6 @@
 package com.ecommerce.order.infrastructure.adapter.in.web;
 
+import com.ecommerce.order.application.service.OrderStatusService;
 import com.ecommerce.order.domain.model.Order;
 import com.ecommerce.order.domain.model.OrderStatus;
 import com.ecommerce.order.domain.port.in.*;
@@ -18,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -32,6 +34,7 @@ public class OrderController {
     private final UpdateOrderStatusUseCase updateOrderStatusUseCase;
     private final PaymentServicePort paymentServicePort;
     private final OrderEventPublisherPort orderEventPublisher;
+    private final OrderStatusService orderStatusService;
 
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(
@@ -106,6 +109,18 @@ public class OrderController {
         return ResponseEntity.ok(OrderResponse.from(updated));
     }
 
+    @PostMapping("/{id}/refund-request")
+    public ResponseEntity<OrderResponse> requestRefundWithReason(
+            @PathVariable UUID id,
+            @RequestBody Map<String, String> payload) {
+        String reason = payload.get("reason");
+        if (reason == null || reason.trim().isEmpty()) {
+            throw new IllegalArgumentException("Le motif du remboursement est obligatoire");
+        }
+        Order updated = orderStatusService.requestRefund(id, reason);
+        return ResponseEntity.ok(OrderResponse.from(updated));
+    }
+
     // --- Approbation du remboursement (admin) ---
     @PostMapping("/{id}/approve-refund")
     @PreAuthorize("hasRole('ADMIN')")
@@ -118,13 +133,11 @@ public class OrderController {
         if ("REFUNDED".equals(payment.status())) {
             throw new IllegalStateException("Le paiement a déjà été remboursé");
         }
-        paymentServicePort.refundPayment(payment.id());   // Stripe rembourse
+        // Appeler le remboursement avec la raison stockée dans la commande
+        paymentServicePort.refundPayment(payment.id(), order.getRefundReason());   // ← ajout de la raison
 
-        // Mettre à jour le statut immédiatement
         Order updatedOrder = updateOrderStatusUseCase.updateStatus(id, OrderStatus.REFUNDED);
-        // Publier l’événement pour le stock (product‑service)
         orderEventPublisher.publishOrderRefunded(updatedOrder);
-
         return ResponseEntity.ok(OrderResponse.from(updatedOrder));
     }
 

@@ -23,8 +23,8 @@ public class RefundPaymentService implements RefundPaymentUseCase {
     private final PaymentEventPublisherPort eventPublisher;
 
     @Override
-    public Payment refund(UUID paymentId) {
-        log.info("Remboursement paymentId={}", paymentId);
+    public Payment refund(UUID paymentId, String reason) {
+        log.info("Remboursement paymentId={}, reason={}", paymentId, reason);
 
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new PaymentNotFoundException(paymentId));
@@ -40,7 +40,8 @@ public class RefundPaymentService implements RefundPaymentUseCase {
 
         provider.refund(payment);
 
-        Payment refunded = payment.refund();
+        // ICI LE CHANGEMENT : on passe la raison
+        Payment refunded = payment.refund(reason);
         Payment saved = paymentRepository.save(refunded);
         eventPublisher.publishPaymentRefunded(saved);
         return saved;

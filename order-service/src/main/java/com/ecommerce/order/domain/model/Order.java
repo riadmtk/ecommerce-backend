@@ -17,6 +17,7 @@ public class Order {
     private OrderStatus status;
     private String shippingAddress;
     private String paymentId;
+    private String refundReason;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -29,6 +30,7 @@ public class Order {
                 .status(newStatus)
                 .shippingAddress(this.shippingAddress)
                 .paymentId(this.paymentId)
+                .refundReason(this.refundReason)   // ← ajout
                 .createdAt(this.createdAt)
                 .updatedAt(LocalDateTime.now())
                 .build();

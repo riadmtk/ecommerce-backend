@@ -8,6 +8,7 @@ export interface Payment {
   status: 'PENDING' | 'SUCCESS' | 'FAILED' | 'REFUNDED';
   transactionId?: string;
   failureReason?: string;
+  refundReason?: string;
   createdAt: string;
 }
 

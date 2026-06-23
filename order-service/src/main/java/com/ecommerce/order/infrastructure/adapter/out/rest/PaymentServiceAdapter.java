@@ -31,7 +31,8 @@ public class PaymentServiceAdapter implements PaymentServicePort {
     }
 
     @Override
-    public void refundPayment(UUID paymentId) {
-        restTemplate.postForObject(paymentServiceUrl + "/" + paymentId + "/refund", null, Void.class);
+    public void refundPayment(UUID paymentId, String reason) {
+        Map<String, String> body = Map.of("reason", reason);
+        restTemplate.postForObject(paymentServiceUrl + "/" + paymentId + "/refund", body, Void.class);
     }
 }

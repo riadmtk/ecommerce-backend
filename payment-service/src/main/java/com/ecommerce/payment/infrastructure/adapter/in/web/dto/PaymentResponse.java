@@ -18,6 +18,7 @@ public record PaymentResponse(
         PaymentStatus status,
         String transactionId,
         String failureReason,
+        String refundReason,
         LocalDateTime createdAt
 ) {
     public static PaymentResponse from(Payment payment) {
@@ -31,6 +32,7 @@ public record PaymentResponse(
                 payment.getStatus(),
                 payment.getTransactionId(),
                 payment.getFailureReason(),
+                payment.getRefundReason(),
                 payment.getCreatedAt()
         );
     }

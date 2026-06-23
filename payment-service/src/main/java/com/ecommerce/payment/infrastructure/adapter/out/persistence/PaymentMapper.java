@@ -19,6 +19,7 @@ public class PaymentMapper {
                 .transactionId(entity.getTransactionId())
                 .clientSecret(null) // jamais stocké en BDD
                 .failureReason(entity.getFailureReason())
+                .refundReason(entity.getRefundReason())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
@@ -35,6 +36,7 @@ public class PaymentMapper {
                 .status(payment.getStatus())
                 .transactionId(payment.getTransactionId())
                 .failureReason(payment.getFailureReason())
+                .refundReason(payment.getRefundReason())
                 .createdAt(payment.getCreatedAt())
                 .updatedAt(payment.getUpdatedAt())
                 .build();

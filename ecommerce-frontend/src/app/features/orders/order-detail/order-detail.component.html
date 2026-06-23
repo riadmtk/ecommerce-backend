@@ -140,16 +140,35 @@
 
         </div>
 
+        <!-- Motif de remboursement (affiché si présent) -->
+        <div *ngIf="order?.refundReason" class="refund-reason-display">
+          <strong>Motif du remboursement :</strong> {{ order.refundReason }}
+        </div>
+
         <!-- Actions paiement -->
         <div class="payment-actions">
+          
           <!-- Pour le client -->
-          <button *ngIf="order.status === 'DELIVERED' && !(isAdmin$ | async)" (click)="requestRefund()"
-            class="btn-warning">
-            Demander un remboursement
-          </button>
+          <!-- Client : demande de remboursement avec motif -->
+          <div *ngIf="order.status === 'DELIVERED' && !(isAdmin$ | async)" class="refund-request-form">
+            <textarea
+              [(ngModel)]="refundReason"
+              placeholder="Expliquez la raison de votre demande (produit défectueux, délai trop long, etc.)"
+              rows="2"
+              [disabled]="isSubmittingRefund"
+            ></textarea>
+            <button
+              (click)="requestRefund()"
+              [disabled]="isSubmittingRefund || !refundReason.trim()"
+              class="btn-warning"
+            >
+              {{ isSubmittingRefund ? 'Envoi...' : 'Demander un remboursement' }}
+            </button>
+          </div>
 
           <!-- Pour l'admin -->
           <ng-container *ngIf="order.status === 'REFUND_REQUESTED' && (isAdmin$ | async)">
+            
             <button (click)="approveRefund()" class="btn-success">Approuver le remboursement</button>
             <button (click)="rejectRefund()" class="btn-danger">Rejeter</button>
           </ng-container>

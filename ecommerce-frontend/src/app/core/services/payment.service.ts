@@ -27,8 +27,8 @@ export class PaymentService {
     return this.http.get<Payment>(`${this.baseUrl}/order/${orderId}`);
   }
 
-  refund(id: string): Observable<Payment> {
-    return this.http.post<Payment>(`${this.baseUrl}/${id}/refund`, {});
+  refund(id: string, reason: string): Observable<Payment> {
+    return this.http.post<Payment>(`${this.baseUrl}/${id}/refund`, { reason });
   }
 
   confirmPayment(paymentId: string): Observable<void> {

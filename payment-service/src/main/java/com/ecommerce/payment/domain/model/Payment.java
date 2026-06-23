@@ -21,6 +21,7 @@ public class Payment {
     private String transactionId;
     private String clientSecret;
     private String failureReason;
+    private String refundReason;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -73,7 +74,7 @@ public class Payment {
                 .build();
     }
 
-    public Payment refund() {
+    public Payment refund(String reason) {
         return Payment.builder()
                 .id(this.id)
                 .orderId(this.orderId)
@@ -84,6 +85,7 @@ public class Payment {
                 .status(PaymentStatus.REFUNDED)
                 .transactionId(this.transactionId)
                 .clientSecret(this.clientSecret)
+                .refundReason(reason)  // <-- NOUVEAU
                 .createdAt(this.createdAt)
                 .updatedAt(LocalDateTime.now())
                 .build();

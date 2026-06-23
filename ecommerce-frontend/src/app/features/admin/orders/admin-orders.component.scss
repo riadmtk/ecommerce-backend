@@ -140,4 +140,19 @@
       }
     }
   }
+
+  .order-body {
+    .refund-reason {
+      font-size: 0.85rem;
+      color: #b45309;
+      background: #fef3c7;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      margin-top: 0.3rem;
+      display: inline-block;
+      .label {
+        font-weight: 600;
+      }
+    }
+  }
 }

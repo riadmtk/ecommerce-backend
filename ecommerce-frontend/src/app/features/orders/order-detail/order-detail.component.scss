@@ -426,4 +426,40 @@
     font-weight: 600;
     border: 1px solid #bbf7d0;
   }
+
+  .refund-request-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin: 12px 0;
+
+    textarea {
+      padding: 12px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-md);
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+      transition: border-color 0.2s;
+      &:focus {
+        outline: none;
+        border-color: #4f46e5;
+      }
+    }
+
+    button {
+      align-self: flex-start;
+    }
+  }
+
+  .refund-reason-display {
+    background: #fef3c7;
+    padding: 12px 16px;
+    border-radius: var(--border-radius-md);
+    border-left: 4px solid #f59e0b;
+    margin: 12px 0;
+    font-size: 14px;
+    color: #78350f;
+  }
 }

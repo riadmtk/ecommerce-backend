@@ -16,7 +16,8 @@ public record OrderResponse(
         BigDecimal totalAmount,
         OrderStatus status,
         String shippingAddress,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        String refundReason   // ← ajout
 ) {
     public static OrderResponse from(Order order) {
         return new OrderResponse(
@@ -26,7 +27,8 @@ public record OrderResponse(
                 order.getTotalAmount(),
                 order.getStatus(),
                 order.getShippingAddress(),
-                order.getCreatedAt()
+                order.getCreatedAt(),
+                order.getRefundReason()   // ← ajout
         );
     }
 }

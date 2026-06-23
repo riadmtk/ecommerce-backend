@@ -32,6 +32,10 @@ public class OrderEntity {
 
     private String shippingAddress;
     private String paymentId;
+
+    @Column(name = "refund_reason")
+    private String refundReason;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

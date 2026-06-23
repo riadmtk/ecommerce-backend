@@ -6,5 +6,5 @@ import java.util.UUID;
 
 public interface PaymentServicePort {
     PaymentResponse getPaymentByOrderId(UUID orderId);
-    void refundPayment(UUID paymentId);
+    void refundPayment(UUID paymentId, String reason);
 }
